@@ -1,13 +1,84 @@
-add-a-bubble/
-├── index.html
-├── style.css
-├── script.js        
-└── stickers/
-    ├── Serious.png
-    ├── Like.png
-    ├── Master.png
-    ├── No-cap.png
-    ├── No-comment.png
-    ├── get-it.png
-    ├── qus.png
-    └── Nice.png
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add a Bubble</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+
+    #camera-view {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+    #sticker {
+      position: absolute;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      max-width: 80vw;
+      pointer-events: none;
+    }
+
+    .carousel {
+      position: absolute;
+      bottom: 0;
+      width: 100vw;
+      height: 100px;
+      display: flex;
+      overflow-x: scroll;
+      background: rgba(0,0,0,0.3);
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    .carousel img {
+      height: 80px;
+      margin: 0 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <video id="camera-view" autoplay playsinline muted></video>
+  <img id="sticker" src="" alt="Sticker" style="display:none;">
+  <div class="carousel" id="carousel">
+    <img src="stickers/Serious.png" alt="Why so serious?" />
+    <img src="stickers/Like.png" alt="Like it." />
+    <img src="stickers/Master.png" alt="Masterpiece." />
+    <img src="stickers/No-cap.png" alt="No cap" />
+    <img src="stickers/No-comment.png" alt="No comment." />
+    <img src="stickers/get-it.png" alt="I don't get it." />
+    <img src="stickers/qus.png" alt="????????????" />
+    <img src="stickers/Nice.png" alt="Nice try." />
+  </div>
+
+  <script>
+    // 카메라 연결
+    const video = document.getElementById('camera-view');
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+      .then(stream => {
+        video.srcObject = stream;
+      });
+
+    // 스티커 선택
+    const sticker = document.getElementById('sticker');
+    document.getElementById('carousel').addEventListener('click', e => {
+      if (e.target.tagName === 'IMG') {
+        sticker.src = e.target.src;
+        sticker.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
