@@ -88,12 +88,18 @@
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
-    // 카메라 연결
+    // 카메라 연결 (고화질 설정 포함)
     const video = document.getElementById('camera-view');
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-      .then(stream => {
-        video.srcObject = stream;
-      });
+    navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: 'environment',
+        width: { ideal: 1920 },
+        height: { ideal: 1080 }
+      }
+    })
+    .then(stream => {
+      video.srcObject = stream;
+    });
 
     // 스티커 선택
     const sticker = document.getElementById('sticker');
