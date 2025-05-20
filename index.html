@@ -47,11 +47,26 @@
       margin: 0 10px;
       cursor: pointer;
     }
+
+    #capture {
+      position: absolute;
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      padding: 10px 20px;
+      background: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <video id="camera-view" autoplay playsinline muted></video>
   <img id="sticker" src="" alt="Sticker" style="display:none;">
+  <button id="capture">📸 TAKE A PICTURE</button>
   <div class="carousel" id="carousel">
     <img src="stickers/Serious.png" alt="Why so serious?" />
     <img src="stickers/Like.png" alt="Like it." />
@@ -63,6 +78,7 @@
     <img src="stickers/Nice.png" alt="Nice try." />
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
     // 카메라 연결
     const video = document.getElementById('camera-view');
@@ -79,6 +95,18 @@
         sticker.style.display = 'block';
       }
     });
+
+    // 캡처 버튼
+    document.getElementById('capture').addEventListener('click', () => {
+      html2canvas(document.body).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.href = imgData;
+        link.download = 'add-a-bubble-capture.png';
+        link.click();
+      });
+    });
   </script>
 </body>
 </html>
+
