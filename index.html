@@ -50,7 +50,7 @@
       cursor: pointer;
     }
 
-    #capture {
+    #capture, #retake {
       position: absolute;
       bottom: 120px;
       left: 50%;
@@ -63,12 +63,18 @@
       font-size: 16px;
       cursor: pointer;
     }
+
+    #retake {
+      display: none;
+      bottom: 180px;
+    }
   </style>
 </head>
 <body>
   <video id="camera-view" autoplay playsinline muted></video>
   <img id="sticker" src="" alt="Sticker" style="display:none;">
   <button id="capture">📸 TAKE A PICTURE</button>
+  <button id="retake">↩ RETAKE</button>
   <div class="carousel" id="carousel">
     <img src="stickers/Serious.png" alt="Why so serious?" />
     <img src="stickers/Like.png" alt="Like it." />
@@ -106,7 +112,13 @@
         link.href = imgData;
         link.download = 'add-a-bubble-capture.png';
         link.click();
+        document.getElementById('retake').style.display = 'block';
       });
+    });
+
+    // 리테이크 버튼
+    document.getElementById('retake').addEventListener('click', () => {
+      location.reload();
     });
   </script>
 </body>
