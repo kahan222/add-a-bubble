@@ -23,13 +23,47 @@
 
     #sticker {
       position: absolute;
-      bottom: 100px;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
-      max-width: 95vw;
+      transform: translate(-50%, -50%) scale(1);
+      max-width: 80vw;
+      max-height: 80vh;
       width: auto;
       height: auto;
       pointer-events: none;
+      display: none;
+      z-index: 5;
+      transition: transform 0.4s ease, opacity 0.4s ease;
+      opacity: 0;
+    }
+
+    #sticker.show {
+      display: block;
+      opacity: 1;
+      animation: popIn 0.4s ease-out;
+    }
+
+    @keyframes popIn {
+      0% {
+        transform: translate(-50%, -50%) scale(0.6);
+        opacity: 0;
+      }
+      100% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+    }
+
+    @keyframes wiggle {
+      0%, 100% {
+        transform: translate(-50%, -50%) rotate(0deg);
+      }
+      25% {
+        transform: translate(-50%, -50%) rotate(2deg);
+      }
+      75% {
+        transform: translate(-50%, -50%) rotate(-2deg);
+      }
     }
 
     .carousel {
@@ -42,6 +76,7 @@
       background: rgba(0,0,0,0.3);
       padding: 10px;
       box-sizing: border-box;
+      z-index: 10;
     }
 
     .carousel img {
@@ -52,10 +87,10 @@
 
     #capture, #retake {
       position: absolute;
-      bottom: 120px;
+      bottom: 30px;
       left: 50%;
       transform: translateX(-50%);
-      z-index: 10;
+      z-index: 20;
       padding: 10px 20px;
       background: white;
       border: none;
@@ -66,15 +101,16 @@
 
     #retake {
       display: none;
-      bottom: 180px;
+      bottom: 90px;
     }
   </style>
 </head>
 <body>
   <video id="camera-view" autoplay playsinline muted></video>
-  <img id="sticker" src="" alt="Sticker" style="display:none;">
+  <img id="sticker" src="" alt="Sticker">
   <button id="capture">📸 TAKE A PICTURE</button>
   <button id="retake">↩ RETAKE</button>
+
   <div class="carousel" id="carousel">
     <img src="stickers/Serious.png" alt="Why so serious?" />
     <img src="stickers/Like.png" alt="Like it." />
@@ -85,12 +121,12 @@
     <img src="stickers/qus.png" alt="????????????" />
     <img src="stickers/Nice.png" alt="Nice try." />
     <img src="stickers/Steal.png" alt="Steal like an artist." />
-    <img src="stickers/Goat.png" alt="Duchamp" />
+    <img src="stickers/Goat.png" alt="Greatest of all time" />
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
-    // 카메라 연결 (고화질 설정 포함)
+    // 카메라 연결
     const video = document.getElementById('camera-view');
     navigator.mediaDevices.getUserMedia({
       video: {
@@ -108,11 +144,21 @@
     document.getElementById('carousel').addEventListener('click', e => {
       if (e.target.tagName === 'IMG') {
         sticker.src = e.target.src;
-        sticker.style.display = 'block';
+
+        // 애니메이션 리셋
+        sticker.classList.remove('show');
+        void sticker.offsetWidth; // 리플로우 트릭
+        sticker.classList.add('show');
+
+        // 흔들림 애니메이션
+        sticker.style.animation = 'popIn 0.4s ease-out, wiggle 0.5s ease-in-out';
+        setTimeout(() => {
+          sticker.style.animation = '';
+        }, 500);
       }
     });
 
-    // 캡처 버튼
+    // 캡처
     document.getElementById('capture').addEventListener('click', () => {
       html2canvas(document.body).then(canvas => {
         const imgData = canvas.toDataURL('image/png');
@@ -124,7 +170,7 @@
       });
     });
 
-    // 리테이크 버튼
+    // 리테이크
     document.getElementById('retake').addEventListener('click', () => {
       location.reload();
     });
