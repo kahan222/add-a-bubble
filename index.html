@@ -160,7 +160,6 @@
     // 스티커 선택
     document.getElementById('carousel').addEventListener('click', e => {
       if (e.target.tagName === 'IMG') {
-        // 스티커 표시
         sticker.src = e.target.src;
         sticker.classList.remove('show');
         void sticker.offsetWidth;
@@ -171,14 +170,14 @@
           sticker.style.animation = '';
         }, 500);
 
-        // 선택된 썸네일 강조
+        // 썸네일 테두리 표시
         const thumbnails = document.querySelectorAll('.carousel img');
         thumbnails.forEach(img => img.classList.remove('selected'));
         e.target.classList.add('selected');
       }
     });
 
-    // 캡처
+    // 캡처 (고화질)
     document.getElementById('capture').addEventListener('click', () => {
       const originalTransform = sticker.style.transform;
       const originalLeft = sticker.style.left;
@@ -188,14 +187,16 @@
       sticker.style.opacity = '1';
       sticker.style.filter = 'none';
 
-      html2canvas(document.body).then(canvas => {
+      html2canvas(document.body, {
+        scale: 3,         // ✅ 고해상도 설정
+        useCORS: true
+      }).then(canvas => {
         const imgData = canvas.toDataURL('image/png');
         const link = document.createElement('a');
         link.href = imgData;
         link.download = 'add-a-bubble-capture.png';
         link.click();
 
-        // 복원
         sticker.style.transform = originalTransform;
         sticker.style.left = originalLeft;
         sticker.style.top = originalTop;
