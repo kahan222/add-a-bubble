@@ -87,29 +87,40 @@
 
     #capture, #retake {
       position: absolute;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 20;
-      padding: 10px 20px;
+      width: 60px;
+      height: 60px;
+      font-size: 30px;
+      padding: 0;
       background: white;
       border: none;
-      border-radius: 5px;
-      font-size: 16px;
+      border-radius: 50%;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+    }
+
+    #capture {
+      bottom: 30px;
+      right: 20px;
+      left: auto;
+      transform: none;
     }
 
     #retake {
       display: none;
-      bottom: 90px;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
     }
   </style>
 </head>
 <body>
   <video id="camera-view" autoplay playsinline muted></video>
   <img id="sticker" src="" alt="Sticker">
-  <button id="capture">📸 TAKE A PICTURE</button>
-  <button id="retake">↩ RETAKE</button>
+  <button id="capture">📸</button>
+  <button id="retake">↩</button>
 
   <div class="carousel" id="carousel">
     <img src="stickers/Serious.png" alt="Why so serious?" />
@@ -166,7 +177,7 @@
         link.href = imgData;
         link.download = 'add-a-bubble-capture.png';
         link.click();
-        document.getElementById('retake').style.display = 'block';
+        document.getElementById('retake').style.display = 'flex';
       });
     });
 
