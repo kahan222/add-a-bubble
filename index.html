@@ -71,7 +71,7 @@
       position: absolute;
       bottom: 0;
       width: 100vw;
-      height: 100px;
+      height: 80px;
       display: flex;
       overflow-x: scroll;
       background: rgba(0,0,0,0.3);
@@ -81,9 +81,16 @@
     }
 
     .carousel img {
-      height: 60px;
+      height: 48px;
       margin: 0 6px;
       cursor: pointer;
+      transition: outline 0.2s ease;
+    }
+
+    .carousel img.selected {
+      outline: 3px solid white;
+      outline-offset: -3px;
+      border-radius: 6px;
     }
 
     #capture, #retake {
@@ -153,6 +160,7 @@
     // 스티커 선택
     document.getElementById('carousel').addEventListener('click', e => {
       if (e.target.tagName === 'IMG') {
+        // 스티커 표시
         sticker.src = e.target.src;
         sticker.classList.remove('show');
         void sticker.offsetWidth;
@@ -162,6 +170,11 @@
         setTimeout(() => {
           sticker.style.animation = '';
         }, 500);
+
+        // 선택된 썸네일 강조
+        const thumbnails = document.querySelectorAll('.carousel img');
+        thumbnails.forEach(img => img.classList.remove('selected'));
+        e.target.classList.add('selected');
       }
     });
 
@@ -171,7 +184,6 @@
       const originalLeft = sticker.style.left;
       const originalTop = sticker.style.top;
 
-      // transform 제거
       sticker.style.transform = 'none';
       sticker.style.opacity = '1';
       sticker.style.filter = 'none';
@@ -197,7 +209,7 @@
       location.reload();
     });
 
-    // 드래그 기능
+    // 스티커 드래그
     let isDragging = false;
     let offsetX, offsetY;
 
@@ -206,11 +218,9 @@
 
     function startDrag(e) {
       isDragging = true;
-
       const rect = sticker.getBoundingClientRect();
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
       offsetX = clientX - rect.left;
       offsetY = clientY - rect.top;
 
@@ -223,13 +233,10 @@
     function onDrag(e) {
       if (!isDragging) return;
       e.preventDefault();
-
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
       const x = clientX - offsetX;
       const y = clientY - offsetY;
-
       sticker.style.left = `${x}px`;
       sticker.style.top = `${y}px`;
       sticker.style.transform = 'scale(1)';
