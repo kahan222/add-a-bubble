@@ -65,6 +65,7 @@
       user-select: none;
       text-shadow: 1px 1px 2px black;
       display: none;
+      word-break: break-word;
     }
 
     .quote-en, .quote-ko {
@@ -83,12 +84,13 @@
     }
 
     #toggle-lang {
-      bottom: 120px;
-      right: 100px;
+      bottom: 100px;
+      left: 20px;
+      font-weight: bold;
     }
 
     #capture {
-      bottom: 30px;
+      bottom: 100px;
       right: 20px;
       width: 60px;
       height: 60px;
@@ -114,7 +116,7 @@
     <div class="quote-ko"></div>
   </div>
 
-  <button id="toggle-lang">🇰🇷/🇺🇸</button>
+  <button id="toggle-lang">KO / EN</button>
   <button id="capture">📸</button>
 
   <script>
@@ -122,7 +124,6 @@
     const bubble = document.getElementById('bubble-text');
     const quoteEn = document.querySelector('.quote-en');
     const quoteKo = document.querySelector('.quote-ko');
-    const toggleBtn = document.getElementById('toggle-lang');
 
     const quotes = {
       picasso: {
@@ -165,12 +166,12 @@
       });
     });
 
-    toggleBtn.addEventListener('click', () => {
+    document.getElementById('toggle-lang').addEventListener('click', () => {
       currentLang = (currentLang === 'en') ? 'ko' : 'en';
       updateLangVisibility();
     });
 
-    // 드래그 기능
+    // 드래그 + 위치 제한
     let isDragging = false;
     let offsetX, offsetY;
 
@@ -196,8 +197,23 @@
       e.preventDefault();
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      bubble.style.left = `${clientX - offsetX}px`;
-      bubble.style.top = `${clientY - offsetY}px`;
+
+      const bubbleWidth = bubble.offsetWidth;
+      const bubbleHeight = bubble.offsetHeight;
+
+      const minX = 0;
+      const minY = 0;
+      const maxX = window.innerWidth - bubbleWidth;
+      const maxY = window.innerHeight - bubbleHeight;
+
+      let x = clientX - offsetX;
+      let y = clientY - offsetY;
+
+      x = Math.max(minX, Math.min(x, maxX));
+      y = Math.max(minY, Math.min(y, maxY));
+
+      bubble.style.left = `${x}px`;
+      bubble.style.top = `${y}px`;
       bubble.style.transform = `translate(0, 0)`;
     }
 
@@ -247,16 +263,8 @@
       ctx.font = `${20 * scaleY}px sans-serif`;
       ctx.textAlign = "center";
 
-      const lines = [];
-      if (currentLang === 'en') {
-        lines.push(quoteEn.textContent);
-      } else {
-        lines.push(quoteKo.textContent);
-      }
-
-      lines.forEach((line, i) => {
-        ctx.fillText(line, x + (bubbleRect.width * scaleX) / 2, y + (30 * scaleY) + i * (30 * scaleY));
-      });
+      const text = (currentLang === 'en') ? quoteEn.textContent : quoteKo.textContent;
+      ctx.fillText(text, x + (bubbleRect.width * scaleX) / 2, y + (bubbleRect.height * scaleY) / 2);
 
       const link = document.createElement('a');
       link.href = canvas.toDataURL('image/png');
