@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Add a Bubble</title>
+  <title>Text Bubble Capture</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
       overflow: hidden;
       font-family: sans-serif;
+      background: black;
     }
 
     #camera-view {
@@ -21,142 +22,164 @@
       z-index: -1;
     }
 
-    #sticker {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%) scale(1);
-      max-width: 80vw;
-      max-height: 80vh;
-      width: auto;
-      height: auto;
-      pointer-events: auto;
-      cursor: grab;
-      display: none;
-      z-index: 5;
-      transition: transform 0.4s ease, opacity 0.4s ease;
-      opacity: 0;
-    }
-
-    #sticker.show {
-      display: block;
-      opacity: 1;
-      animation: popIn 0.4s ease-out;
-    }
-
-    @keyframes popIn {
-      0% {
-        transform: translate(-50%, -50%) scale(0.6);
-        opacity: 0;
-      }
-      100% {
-        transform: translate(-50%, -50%) scale(1);
-        opacity: 1;
-      }
-    }
-
-    .carousel {
+    .text-carousel {
       position: absolute;
       bottom: 0;
       width: 100vw;
       height: 80px;
       display: flex;
       overflow-x: scroll;
-      background: rgba(0,0,0,0.3);
+      background: rgba(0,0,0,0.4);
       padding: 10px;
       box-sizing: border-box;
       z-index: 10;
     }
 
-    .carousel img {
-      height: 48px;
-      margin: 0 6px;
+    .text-option {
+      background: white;
+      color: black;
+      font-weight: bold;
+      border-radius: 20px;
+      padding: 10px 16px;
+      margin: 0 8px;
+      white-space: nowrap;
       cursor: pointer;
-      transition: outline 0.2s ease;
+      font-size: 14px;
     }
 
-    .carousel img.selected {
-      outline: 3px solid white;
-      outline-offset: -3px;
-      border-radius: 6px;
+    #bubble-text {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.7);
+      padding: 14px 20px;
+      border-radius: 20px;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      max-width: 80vw;
+      text-align: center;
+      z-index: 5;
+      pointer-events: auto;
+      cursor: grab;
+      user-select: none;
+      text-shadow: 1px 1px 2px black;
+      display: none;
+    }
+
+    .quote-en, .quote-ko {
+      margin: 4px 0;
+    }
+
+    #toggle-lang, #capture {
+      position: absolute;
+      z-index: 10;
+      background: white;
+      border: none;
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    #toggle-lang {
+      bottom: 120px;
+      right: 100px;
     }
 
     #capture {
-      position: absolute;
       bottom: 30px;
       right: 20px;
       width: 60px;
       height: 60px;
-      font-size: 30px;
-      background: white;
-      border: none;
+      font-size: 26px;
       border-radius: 50%;
-      cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      z-index: 20;
     }
   </style>
 </head>
 <body>
   <video id="camera-view" autoplay playsinline muted></video>
-  <img id="sticker" src="" alt="Sticker">
-  <button id="capture">📸</button>
 
-  <div class="carousel" id="carousel">
-    <img src="stickers/Serious.png" alt="Why so serious?" />
-    <img src="stickers/Like.png" alt="Like it." />
-    <img src="stickers/Master.png" alt="Masterpiece." />
-    <img src="stickers/No-cap.png" alt="No cap" />
-    <img src="stickers/No-comment.png" alt="No comment." />
-    <img src="stickers/get-it.png" alt="I don't get it." />
-    <img src="stickers/qus.png" alt="????????????" />
-    <img src="stickers/Nice.png" alt="Nice try." />
-    <img src="stickers/Steal.png" alt="Steal like an artist." />
-    <img src="stickers/Goat.png" alt="Greatest of all time" />
+  <div class="text-carousel">
+    <div class="text-option" data-id="picasso">Picasso 피카소</div>
+    <div class="text-option" data-id="davinci">Da Vinci 다빈치</div>
+    <div class="text-option" data-id="paik">Paik 백남준</div>
   </div>
+
+  <div id="bubble-text">
+    <div class="quote-en"></div>
+    <div class="quote-ko"></div>
+  </div>
+
+  <button id="toggle-lang">🇰🇷/🇺🇸</button>
+  <button id="capture">📸</button>
 
   <script>
     const video = document.getElementById('camera-view');
-    const sticker = document.getElementById('sticker');
-    const captureBtn = document.getElementById('capture');
+    const bubble = document.getElementById('bubble-text');
+    const quoteEn = document.querySelector('.quote-en');
+    const quoteKo = document.querySelector('.quote-ko');
+    const toggleBtn = document.getElementById('toggle-lang');
 
-    // 카메라 연결
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-      .then(stream => {
-        video.srcObject = stream;
-      });
-
-    // 스티커 선택
-    document.getElementById('carousel').addEventListener('click', e => {
-      if (e.target.tagName === 'IMG') {
-        sticker.src = e.target.src;
-        sticker.style.left = '50%';
-        sticker.style.top = '50%';
-        sticker.style.transform = 'translate(-50%, -50%) scale(1)';
-        sticker.classList.remove('show');
-        void sticker.offsetWidth;
-        sticker.classList.add('show');
-
-        // 썸네일 선택 테두리 표시
-        document.querySelectorAll('.carousel img').forEach(img => {
-          img.classList.remove('selected');
-        });
-        e.target.classList.add('selected');
+    const quotes = {
+      picasso: {
+        en: "Art is a lie that tells the truth.",
+        ko: "예술은 진실을 말해주는 거짓말이다."
+      },
+      davinci: {
+        en: "Simplicity is the ultimate sophistication.",
+        ko: "단순함은 최고의 정교함이다."
+      },
+      paik: {
+        en: "TV is the most powerful mirror.",
+        ko: "TV는 가장 강력한 거울이다."
       }
+    };
+
+    let currentLang = 'en';
+
+    function updateQuote(id) {
+      const quote = quotes[id];
+      if (!quote) return;
+      quoteEn.textContent = quote.en;
+      quoteKo.textContent = quote.ko;
+      bubble.style.display = 'block';
+      bubble.style.left = '50%';
+      bubble.style.top = '50%';
+      bubble.style.transform = 'translate(-50%, -50%)';
+      updateLangVisibility();
+    }
+
+    function updateLangVisibility() {
+      quoteEn.style.display = (currentLang === 'en') ? 'block' : 'none';
+      quoteKo.style.display = (currentLang === 'ko') ? 'block' : 'none';
+    }
+
+    document.querySelectorAll('.text-option').forEach(option => {
+      option.addEventListener('click', () => {
+        const id = option.dataset.id;
+        updateQuote(id);
+      });
     });
 
-    // 드래그로 스티커 이동
+    toggleBtn.addEventListener('click', () => {
+      currentLang = (currentLang === 'en') ? 'ko' : 'en';
+      updateLangVisibility();
+    });
+
+    // 드래그 기능
     let isDragging = false;
     let offsetX, offsetY;
 
-    sticker.addEventListener('mousedown', startDrag);
-    sticker.addEventListener('touchstart', startDrag, { passive: false });
+    bubble.addEventListener('mousedown', startDrag);
+    bubble.addEventListener('touchstart', startDrag, { passive: false });
 
     function startDrag(e) {
       isDragging = true;
-      const rect = sticker.getBoundingClientRect();
+      const rect = bubble.getBoundingClientRect();
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
       offsetX = clientX - rect.left;
@@ -173,11 +196,9 @@
       e.preventDefault();
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      const x = clientX - offsetX;
-      const y = clientY - offsetY;
-      sticker.style.left = `${x}px`;
-      sticker.style.top = `${y}px`;
-      sticker.style.transform = 'scale(1)';
+      bubble.style.left = `${clientX - offsetX}px`;
+      bubble.style.top = `${clientY - offsetY}px`;
+      bubble.style.transform = `translate(0, 0)`;
     }
 
     function stopDrag() {
@@ -188,14 +209,20 @@
       document.removeEventListener('touchend', stopDrag);
     }
 
-    // 고화질 캡처 (canvas 기반)
-    captureBtn.addEventListener('click', () => {
+    // 카메라 연결
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+      .then(stream => {
+        video.srcObject = stream;
+      });
+
+    // 고화질 캡처
+    document.getElementById('capture').addEventListener('click', () => {
       const canvas = document.createElement('canvas');
       const width = video.videoWidth;
       const height = video.videoHeight;
 
       if (!width || !height) {
-        alert("카메라가 아직 준비되지 않았습니다.");
+        alert("카메라 준비 중입니다.");
         return;
       }
 
@@ -203,31 +230,38 @@
       canvas.height = height;
       const ctx = canvas.getContext('2d');
 
-      // 비디오 이미지 그리기
       ctx.drawImage(video, 0, 0, width, height);
 
-      const stickerImg = new Image();
-      stickerImg.src = sticker.src;
+      const bubbleRect = bubble.getBoundingClientRect();
+      const videoRect = video.getBoundingClientRect();
+      const scaleX = width / videoRect.width;
+      const scaleY = height / videoRect.height;
 
-      stickerImg.onload = () => {
-        const rect = sticker.getBoundingClientRect();
-        const videoRect = video.getBoundingClientRect();
+      const x = (bubbleRect.left - videoRect.left) * scaleX;
+      const y = (bubbleRect.top - videoRect.top) * scaleY;
 
-        const scaleX = width / videoRect.width;
-        const scaleY = height / videoRect.height;
+      ctx.fillStyle = "rgba(0,0,0,0.7)";
+      ctx.fillRect(x, y, bubbleRect.width * scaleX, bubbleRect.height * scaleY);
 
-        const x = (rect.left - videoRect.left) * scaleX;
-        const y = (rect.top - videoRect.top) * scaleY;
-        const w = rect.width * scaleX;
-        const h = rect.height * scaleY;
+      ctx.fillStyle = "white";
+      ctx.font = `${20 * scaleY}px sans-serif`;
+      ctx.textAlign = "center";
 
-        ctx.drawImage(stickerImg, x, y, w, h);
+      const lines = [];
+      if (currentLang === 'en') {
+        lines.push(quoteEn.textContent);
+      } else {
+        lines.push(quoteKo.textContent);
+      }
 
-        const link = document.createElement('a');
-        link.href = canvas.toDataURL('image/png');
-        link.download = 'bubble-capture.png';
-        link.click();
-      };
+      lines.forEach((line, i) => {
+        ctx.fillText(line, x + (bubbleRect.width * scaleX) / 2, y + (30 * scaleY) + i * (30 * scaleY));
+      });
+
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = 'text-bubble-capture.png';
+      link.click();
     });
   </script>
 </body>
