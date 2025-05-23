@@ -26,7 +26,7 @@
       position: absolute;
       bottom: 0;
       width: 100vw;
-      height: 80px;
+      height: 100px;
       display: flex;
       overflow-x: scroll;
       background: rgba(0,0,0,0.4);
@@ -38,13 +38,31 @@
     .text-option {
       background: white;
       color: black;
-      font-weight: bold;
-      border-radius: 20px;
-      padding: 10px 16px;
+      border-radius: 12px;
+      padding: 6px 12px;
       margin: 0 8px;
-      white-space: nowrap;
       cursor: pointer;
-      font-size: 14px;
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+
+    .text-option.selected {
+      border: 2px solid black;
+      background: #f0f0f0;
+    }
+
+    .name-en {
+      font-weight: bold;
+      font-size: 13px;
+    }
+
+    .name-ko {
+      font-size: 12px;
+      color: #555;
     }
 
     #bubble-text {
@@ -106,9 +124,18 @@
   <video id="camera-view" autoplay playsinline muted></video>
 
   <div class="text-carousel">
-    <div class="text-option" data-id="picasso">Picasso 피카소</div>
-    <div class="text-option" data-id="davinci">Da Vinci 다빈치</div>
-    <div class="text-option" data-id="paik">Paik 백남준</div>
+    <div class="text-option" data-id="picasso">
+      <div class="name-en">Picasso</div>
+      <div class="name-ko">피카소</div>
+    </div>
+    <div class="text-option" data-id="davinci">
+      <div class="name-en">Da Vinci</div>
+      <div class="name-ko">다빈치</div>
+    </div>
+    <div class="text-option" data-id="paik">
+      <div class="name-en">Paik</div>
+      <div class="name-ko">백남준</div>
+    </div>
   </div>
 
   <div id="bubble-text">
@@ -142,7 +169,7 @@
 
     let currentLang = 'en';
 
-    function updateQuote(id) {
+    function updateQuote(id, optionEl) {
       const quote = quotes[id];
       if (!quote) return;
       quoteEn.textContent = quote.en;
@@ -152,6 +179,9 @@
       bubble.style.top = '50%';
       bubble.style.transform = 'translate(-50%, -50%)';
       updateLangVisibility();
+
+      document.querySelectorAll('.text-option').forEach(el => el.classList.remove('selected'));
+      optionEl.classList.add('selected');
     }
 
     function updateLangVisibility() {
@@ -162,7 +192,7 @@
     document.querySelectorAll('.text-option').forEach(option => {
       option.addEventListener('click', () => {
         const id = option.dataset.id;
-        updateQuote(id);
+        updateQuote(id, option);
       });
     });
 
