@@ -5,14 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Text Bubble Capture</title>
   <style>
-    html, body {
+    * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
       overflow: hidden;
       font-family: sans-serif;
       background: black;
     }
-
     #camera-view {
       position: fixed;
       top: 0; left: 0;
@@ -21,26 +23,23 @@
       object-fit: cover;
       z-index: -1;
     }
-
     .text-carousel {
       position: absolute;
       bottom: 0;
       width: 100vw;
-      height: 100px;
+      height: 80px;
       display: flex;
-      overflow-x: scroll;
+      overflow-x: auto;
       background: rgba(0,0,0,0.4);
-      padding: 10px;
-      box-sizing: border-box;
+      padding: 6px;
       z-index: 10;
     }
-
     .text-option {
       background: white;
       color: black;
       border-radius: 12px;
-      padding: 6px 12px;
-      margin: 0 8px;
+      padding: 4px 10px;
+      margin: 0 6px;
       cursor: pointer;
       font-size: 13px;
       display: flex;
@@ -49,22 +48,17 @@
       justify-content: center;
       white-space: nowrap;
     }
-
     .text-option.selected {
       border: 2px solid black;
       background: #f0f0f0;
     }
-
     .name-en {
       font-weight: bold;
-      font-size: 13px;
     }
-
     .name-ko {
       font-size: 12px;
       color: #555;
     }
-
     #bubble-text {
       position: absolute;
       top: 50%; left: 50%;
@@ -85,11 +79,9 @@
       display: none;
       word-break: break-word;
     }
-
     .quote-en, .quote-ko {
       margin: 4px 0;
     }
-
     #toggle-lang, #capture {
       position: absolute;
       z-index: 10;
@@ -100,15 +92,13 @@
       font-size: 14px;
       cursor: pointer;
     }
-
     #toggle-lang {
-      bottom: 100px;
+      bottom: 130px;
       left: 20px;
       font-weight: bold;
     }
-
     #capture {
-      bottom: 100px;
+      bottom: 130px;
       right: 20px;
       width: 60px;
       height: 60px;
@@ -209,7 +199,7 @@
       updateLangVisibility();
     });
 
-    // 드래그 + 위치 제한
+    // 드래그
     let isDragging = false;
     let offsetX, offsetY;
 
@@ -269,7 +259,7 @@
         video.srcObject = stream;
       });
 
-    // 고화질 캡처
+    // 캡처 기능
     document.getElementById('capture').addEventListener('click', () => {
       const canvas = document.createElement('canvas');
       const width = video.videoWidth;
