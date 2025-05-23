@@ -55,18 +55,6 @@
       }
     }
 
-    @keyframes wiggle {
-      0%, 100% {
-        transform: rotate(0deg);
-      }
-      25% {
-        transform: rotate(2deg);
-      }
-      75% {
-        transform: rotate(-2deg);
-      }
-    }
-
     .carousel {
       position: absolute;
       bottom: 0;
@@ -93,12 +81,13 @@
       border-radius: 6px;
     }
 
-    #capture, #retake {
+    #capture {
       position: absolute;
+      bottom: 30px;
+      right: 20px;
       width: 60px;
       height: 60px;
       font-size: 30px;
-      padding: 0;
       background: white;
       border: none;
       border-radius: 50%;
@@ -108,25 +97,12 @@
       justify-content: center;
       z-index: 20;
     }
-
-    #capture {
-      bottom: 30px;
-      right: 20px;
-    }
-
-    #retake {
-      display: none;
-      bottom: 100px;
-      left: 50%;
-      transform: translateX(-50%);
-    }
   </style>
 </head>
 <body>
   <video id="camera-view" autoplay playsinline muted></video>
   <img id="sticker" src="" alt="Sticker">
   <button id="capture">📸</button>
-  <button id="retake">↩</button>
 
   <div class="carousel" id="carousel">
     <img src="stickers/Serious.png" alt="Why so serious?" />
@@ -141,82 +117,37 @@
     <img src="stickers/Goat.png" alt="Greatest of all time" />
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script>
     const video = document.getElementById('camera-view');
     const sticker = document.getElementById('sticker');
+    const captureBtn = document.getElementById('capture');
 
     // 카메라 연결
-    navigator.mediaDevices.getUserMedia({
-      video: {
-        facingMode: 'environment',
-        width: { ideal: 1920 },
-        height: { ideal: 1080 }
-      }
-    }).then(stream => {
-      video.srcObject = stream;
-    });
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+      .then(stream => {
+        video.srcObject = stream;
+      });
 
     // 스티커 선택
     document.getElementById('carousel').addEventListener('click', e => {
       if (e.target.tagName === 'IMG') {
         sticker.src = e.target.src;
-    
-        // 💡 위치 초기화
         sticker.style.left = '50%';
         sticker.style.top = '50%';
         sticker.style.transform = 'translate(-50%, -50%) scale(1)';
-        
         sticker.classList.remove('show');
         void sticker.offsetWidth;
         sticker.classList.add('show');
-        sticker.style.transform = 'translate(-50%, -50%) scale(1)';
-        sticker.style.animation = 'popIn 0.4s ease-out, wiggle 0.5s ease-in-out';
-        setTimeout(() => {
-          sticker.style.animation = '';
-        }, 500);
 
-        // 썸네일 테두리 표시
-        const thumbnails = document.querySelectorAll('.carousel img');
-        thumbnails.forEach(img => img.classList.remove('selected'));
+        // 썸네일 선택 테두리 표시
+        document.querySelectorAll('.carousel img').forEach(img => {
+          img.classList.remove('selected');
+        });
         e.target.classList.add('selected');
       }
     });
 
-    // 캡처 (고화질)
-    document.getElementById('capture').addEventListener('click', () => {
-      const originalTransform = sticker.style.transform;
-      const originalLeft = sticker.style.left;
-      const originalTop = sticker.style.top;
-
-      sticker.style.transform = 'none';
-      sticker.style.opacity = '1';
-      sticker.style.filter = 'none';
-
-      html2canvas(document.body, {
-        scale: 3,         // ✅ 고해상도 설정
-        useCORS: true
-      }).then(canvas => {
-        const imgData = canvas.toDataURL('image/png');
-        const link = document.createElement('a');
-        link.href = imgData;
-        link.download = 'add-a-bubble-capture.png';
-        link.click();
-
-        sticker.style.transform = originalTransform;
-        sticker.style.left = originalLeft;
-        sticker.style.top = originalTop;
-
-        document.getElementById('retake').style.display = 'flex';
-      });
-    });
-
-    // 리테이크
-    document.getElementById('retake').addEventListener('click', () => {
-      location.reload();
-    });
-
-    // 스티커 드래그
+    // 드래그로 스티커 이동
     let isDragging = false;
     let offsetX, offsetY;
 
@@ -256,6 +187,48 @@
       document.removeEventListener('touchmove', onDrag);
       document.removeEventListener('touchend', stopDrag);
     }
+
+    // 고화질 캡처 (canvas 기반)
+    captureBtn.addEventListener('click', () => {
+      const canvas = document.createElement('canvas');
+      const width = video.videoWidth;
+      const height = video.videoHeight;
+
+      if (!width || !height) {
+        alert("카메라가 아직 준비되지 않았습니다.");
+        return;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+
+      // 비디오 이미지 그리기
+      ctx.drawImage(video, 0, 0, width, height);
+
+      const stickerImg = new Image();
+      stickerImg.src = sticker.src;
+
+      stickerImg.onload = () => {
+        const rect = sticker.getBoundingClientRect();
+        const videoRect = video.getBoundingClientRect();
+
+        const scaleX = width / videoRect.width;
+        const scaleY = height / videoRect.height;
+
+        const x = (rect.left - videoRect.left) * scaleX;
+        const y = (rect.top - videoRect.top) * scaleY;
+        const w = rect.width * scaleX;
+        const h = rect.height * scaleY;
+
+        ctx.drawImage(stickerImg, x, y, w, h);
+
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL('image/png');
+        link.download = 'bubble-capture.png';
+        link.click();
+      };
+    });
   </script>
 </body>
 </html>
