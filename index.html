@@ -112,7 +112,6 @@
 </head>
 <body>
   <video id="camera-view" autoplay playsinline muted></video>
-
   <div class="text-carousel">
     <div class="text-option" data-id="JohnCage">
       <div class="name-en">John Cage</div>
@@ -131,12 +130,10 @@
       <div class="name-ko">마리나 아브라모비치</div>
     </div>
   </div>
-
   <div id="bubble-text">
     <div class="quote-en"></div>
     <div class="quote-ko"></div>
   </div>
-
   <button id="toggle-lang">KO / EN</button>
   <button id="capture">📸</button>
 
@@ -145,7 +142,6 @@
     const bubble = document.getElementById('bubble-text');
     const quoteEn = document.querySelector('.quote-en');
     const quoteKo = document.querySelector('.quote-ko');
-
     const quotes = {
       JohnCage: {
         en: "I can't understand why people are frightened of new ideas. I'm frightened of the old ones.",
@@ -166,7 +162,6 @@
     };
 
     let currentLang = 'en';
-
     function updateQuote(id, optionEl) {
       const quote = quotes[id];
       if (!quote) return;
@@ -177,35 +172,24 @@
       bubble.style.top = '50%';
       bubble.style.transform = 'translate(-50%, -50%)';
       updateLangVisibility();
-
       document.querySelectorAll('.text-option').forEach(el => el.classList.remove('selected'));
       optionEl.classList.add('selected');
     }
-
     function updateLangVisibility() {
       quoteEn.style.display = (currentLang === 'en') ? 'block' : 'none';
       quoteKo.style.display = (currentLang === 'ko') ? 'block' : 'none';
     }
-
     document.querySelectorAll('.text-option').forEach(option => {
-      option.addEventListener('click', () => {
-        const id = option.dataset.id;
-        updateQuote(id, option);
-      });
+      option.addEventListener('click', () => updateQuote(option.dataset.id, option));
     });
-
     document.getElementById('toggle-lang').addEventListener('click', () => {
       currentLang = (currentLang === 'en') ? 'ko' : 'en';
       updateLangVisibility();
     });
-
-    // 드래그
     let isDragging = false;
     let offsetX, offsetY;
-
     bubble.addEventListener('mousedown', startDrag);
     bubble.addEventListener('touchstart', startDrag, { passive: false });
-
     function startDrag(e) {
       isDragging = true;
       const rect = bubble.getBoundingClientRect();
@@ -213,38 +197,28 @@
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
       offsetX = clientX - rect.left;
       offsetY = clientY - rect.top;
-
       document.addEventListener('mousemove', onDrag);
       document.addEventListener('mouseup', stopDrag);
       document.addEventListener('touchmove', onDrag, { passive: false });
       document.addEventListener('touchend', stopDrag);
     }
-
     function onDrag(e) {
       if (!isDragging) return;
       e.preventDefault();
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
       const bubbleWidth = bubble.offsetWidth;
       const bubbleHeight = bubble.offsetHeight;
-
-      const minX = 0;
-      const minY = 0;
       const maxX = window.innerWidth - bubbleWidth;
       const maxY = window.innerHeight - bubbleHeight;
-
       let x = clientX - offsetX;
       let y = clientY - offsetY;
-
-      x = Math.max(minX, Math.min(x, maxX));
-      y = Math.max(minY, Math.min(y, maxY));
-
+      x = Math.max(0, Math.min(x, maxX));
+      y = Math.max(0, Math.min(y, maxY));
       bubble.style.left = `${x}px`;
       bubble.style.top = `${y}px`;
       bubble.style.transform = `translate(0, 0)`;
     }
-
     function stopDrag() {
       isDragging = false;
       document.removeEventListener('mousemove', onDrag);
@@ -252,48 +226,54 @@
       document.removeEventListener('touchmove', onDrag);
       document.removeEventListener('touchend', stopDrag);
     }
-
-    // 카메라 연결
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-      .then(stream => {
-        video.srcObject = stream;
-      });
+      .then(stream => video.srcObject = stream);
 
-    // 캡처 기능
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+      const words = text.split(' ');
+      let line = '';
+      for (let i = 0; i < words.length; i++) {
+        const testLine = line + words[i] + ' ';
+        const testWidth = ctx.measureText(testLine).width;
+        if (testWidth > maxWidth && i > 0) {
+          ctx.fillText(line, x, y);
+          line = words[i] + ' ';
+          y += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.fillText(line, x, y);
+    }
+
     document.getElementById('capture').addEventListener('click', () => {
       const canvas = document.createElement('canvas');
       const width = video.videoWidth;
       const height = video.videoHeight;
-
       if (!width || !height) {
         alert("카메라 준비 중입니다.");
         return;
       }
-
       canvas.width = width;
       canvas.height = height;
       const ctx = canvas.getContext('2d');
-
       ctx.drawImage(video, 0, 0, width, height);
-
       const bubbleRect = bubble.getBoundingClientRect();
       const videoRect = video.getBoundingClientRect();
       const scaleX = width / videoRect.width;
       const scaleY = height / videoRect.height;
-
       const x = (bubbleRect.left - videoRect.left) * scaleX;
       const y = (bubbleRect.top - videoRect.top) * scaleY;
-
+      const bubbleW = bubbleRect.width * scaleX;
+      const bubbleH = bubbleRect.height * scaleY;
       ctx.fillStyle = "rgba(0,0,0,0.7)";
-      ctx.fillRect(x, y, bubbleRect.width * scaleX, bubbleRect.height * scaleY);
-
+      ctx.fillRect(x, y, bubbleW, bubbleH);
       ctx.fillStyle = "white";
-      ctx.font = `${20 * scaleY}px sans-serif`;
+      ctx.font = `${18 * scaleY}px sans-serif`;
       ctx.textAlign = "center";
-
+      ctx.textBaseline = "middle";
       const text = (currentLang === 'en') ? quoteEn.textContent : quoteKo.textContent;
-      ctx.fillText(text, x + (bubbleRect.width * scaleX) / 2, y + (bubbleRect.height * scaleY) / 2);
-
+      wrapText(ctx, text, x + bubbleW/2, y + bubbleH/2 - 10, bubbleW - 20, 24 * scaleY);
       const link = document.createElement('a');
       link.href = canvas.toDataURL('image/png');
       link.download = 'text-bubble-capture.png';
