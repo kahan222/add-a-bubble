@@ -161,6 +161,12 @@
     document.getElementById('carousel').addEventListener('click', e => {
       if (e.target.tagName === 'IMG') {
         sticker.src = e.target.src;
+    
+        // 💡 위치 초기화
+        sticker.style.left = '50%';
+        sticker.style.top = '50%';
+        sticker.style.transform = 'translate(-50%, -50%) scale(1)';
+        
         sticker.classList.remove('show');
         void sticker.offsetWidth;
         sticker.classList.add('show');
