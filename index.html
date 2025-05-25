@@ -79,10 +79,16 @@
       display: none;
       word-break: break-word;
     }
+    .bubble-style-2 {
+      background: white !important;
+      color: black !important;
+      font-family: "Courier New", monospace !important;
+      text-shadow: none !important;
+    }
     .quote-en, .quote-ko {
       margin: 4px 0;
     }
-    #toggle-lang, #capture {
+    #toggle-lang, #capture, #share, #style-toggle {
       position: absolute;
       z-index: 10;
       background: white;
@@ -107,6 +113,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+    #style-toggle {
+      bottom: 200px;
+      right: 20px;
+    }
+    #share {
+      bottom: 200px;
+      left: 20px;
     }
   </style>
 </head>
