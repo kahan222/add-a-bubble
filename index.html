@@ -45,7 +45,6 @@
       white-space: nowrap;
     }
     .text-option.selected {
-      border: 2px solid black;
       background: #f0f0f0;
     }
     .name-en { font-weight: bold; }
@@ -67,10 +66,10 @@
       pointer-events: auto;
       cursor: grab;
       user-select: none;
-      text-shadow: 1px 1px 2px black;
       display: none;
       word-break: break-word;
     }
+
     .quote-en, .quote-ko { margin: 4px 0; }
 
     #toggle-lang, #capture, #share, #style-toggle {
@@ -83,28 +82,62 @@
       font-size: 14px;
       cursor: pointer;
     }
+
     #toggle-lang { bottom: 120px; left: 20px; font-weight: bold; }
+
     #capture {
-      bottom: 120px; left: 50%;
-      width: 60px; height: 60px;
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 60px;
       font-size: 25px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
     }
+
     #style-toggle { bottom: 120px; right: 20px; }
+
     #share {
       bottom: 200px; left: 20px;
     }
+
     #share:disabled {
       opacity: 0.4;
       cursor: not-allowed;
     }
+
+    /* 네온 텍스트 스타일 */
+    .bubble-style-neon-green {
+      text-shadow:
+        0 0 5px #00ff90,
+        0 0 10px #00ff90,
+        0 0 20px #00ff90,
+        0 0 40px #00ff90;
+    }
+
+    .bubble-style-neon-orange {
+      text-shadow:
+        0 0 5px #ffaa00,
+        0 0 10px #ffaa00,
+        0 0 20px #ffaa00,
+        0 0 40px #ffaa00;
+    }
+
+    .bubble-style-neon-blue {
+      text-shadow:
+        0 0 5px #00ccff,
+        0 0 10px #00ccff,
+        0 0 20px #00ccff,
+        0 0 40px #00ccff;
+    }
   </style>
 </head>
 <body>
-  <video id="camera-view" autoplay playsinline muted></video>
+
+    <video id="camera-view" autoplay playsinline muted></video>
 
   <div class="text-carousel">
     <div class="text-option" data-id="JohnCage"><div class="name-en">John Cage</div><div class="name-ko">존 케이지</div></div>
@@ -208,10 +241,22 @@
       updateLangVisibility();
     });
 
+    // 네온 색상 순환 토글
+    const neonClasses = [
+      'bubble-style-neon-green',
+      'bubble-style-neon-orange',
+      'bubble-style-neon-blue'
+    ];
+    let currentNeonIndex = 0;
+    bubble.classList.add(neonClasses[0]);
+
     document.getElementById('style-toggle').addEventListener('click', () => {
-      bubble.classList.toggle('bubble-style-2');
+      bubble.classList.remove(neonClasses[currentNeonIndex]);
+      currentNeonIndex = (currentNeonIndex + 1) % neonClasses.length;
+      bubble.classList.add(neonClasses[currentNeonIndex]);
     });
 
+    // 드래그 기능
     let isDragging = false, offsetX, offsetY;
     bubble.addEventListener('mousedown', startDrag);
     bubble.addEventListener('touchstart', startDrag, { passive: false });
@@ -257,7 +302,8 @@
 
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
       .then(stream => video.srcObject = stream);
-    function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
       const words = text.split(' ');
       let line = '';
       for (let i = 0; i < words.length; i++) {
@@ -310,7 +356,7 @@
       const text = (currentLang === 'en') ? quoteEn.textContent : quoteKo.textContent;
       wrapText(ctx, text, x + bubbleW / 2, y + bubbleH / 2 - 10, bubbleW - 20, 24 * scaleY);
 
-      // 이미지 다운로드
+      // 이미지 다운로드 + Web Share API용 blob 저장
       canvas.toBlob((blob) => {
         lastCaptureBlob = blob;
 
@@ -319,8 +365,7 @@
         link.download = 'text-bubble-capture.png';
         link.click();
 
-        // 📤 Share 버튼 활성화
-        document.getElementById('share').disabled = false;
+        document.getElementById('share').disabled = false; // 공유 버튼 활성화
       }, 'image/png');
     });
 
@@ -346,7 +391,7 @@
         console.error('공유 실패:', err);
       }
 
-      // 📤 공유 후 다시 비활성화
+      // 공유 후 비활성화
       document.getElementById('share').disabled = true;
     });
   </script>
