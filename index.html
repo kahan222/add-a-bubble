@@ -86,7 +86,7 @@
     #toggle-lang { bottom: 120px; left: 20px; font-weight: bold; }
 
     #capture {
-      bottom: 120px;
+      bottom: 30px;
       left: 50%;
       transform: translateX(-50%);
       width: 60px;
@@ -109,7 +109,6 @@
       cursor: not-allowed;
     }
 
-    /* 네온 텍스트 스타일 */
     .bubble-style-neon-green {
       text-shadow:
         0 0 5px #00ff90,
@@ -241,7 +240,6 @@
       updateLangVisibility();
     });
 
-    // 네온 색상 순환 토글
     const neonClasses = [
       'bubble-style-neon-green',
       'bubble-style-neon-orange',
@@ -310,6 +308,7 @@
         const testLine = line + words[i] + ' ';
         const testWidth = ctx.measureText(testLine).width;
         if (testWidth > maxWidth && i > 0) {
+          ctx.strokeText(line, x, y);
           ctx.fillText(line, x, y);
           line = words[i] + ' ';
           y += lineHeight;
@@ -317,6 +316,7 @@
           line = testLine;
         }
       }
+      ctx.strokeText(line, x, y);
       ctx.fillText(line, x, y);
     }
 
@@ -345,27 +345,35 @@
       const bubbleW = bubbleRect.width * scaleX;
       const bubbleH = bubbleRect.height * scaleY;
 
-      ctx.fillStyle = window.getComputedStyle(bubble).backgroundColor;
-      ctx.fillRect(x, y, bubbleW, bubbleH);
-
-      ctx.fillStyle = window.getComputedStyle(bubble).color;
+      // 말풍선 배경 생략, 텍스트 외곽선 강조
       ctx.font = `${18 * scaleY}px sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
       const text = (currentLang === 'en') ? quoteEn.textContent : quoteKo.textContent;
+
+      // 네온 외곽선 색 결정
+      const neonColors = ["#00ff90", "#ffaa00", "#00ccff"];
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = neonColors[currentNeonIndex];
+      ctx.fillStyle = "white";
+
       wrapText(ctx, text, x + bubbleW / 2, y + bubbleH / 2 - 10, bubbleW - 20, 24 * scaleY);
 
-      // 이미지 다운로드 + Web Share API용 blob 저장
       canvas.toBlob((blob) => {
+        if (!blob) return;
         lastCaptureBlob = blob;
 
+        const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
-        link.href = URL.createObjectURL(blob);
+        link.href = url;
         link.download = 'text-bubble-capture.png';
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
 
-        document.getElementById('share').disabled = false; // 공유 버튼 활성화
+        document.getElementById('share').disabled = false;
       }, 'image/png');
     });
 
@@ -391,7 +399,6 @@
         console.error('공유 실패:', err);
       }
 
-      // 공유 후 비활성화
       document.getElementById('share').disabled = true;
     });
   </script>
