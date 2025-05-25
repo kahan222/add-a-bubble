@@ -72,7 +72,7 @@
 
     .quote-en, .quote-ko { margin: 4px 0; }
 
-    #toggle-lang, #capture, #share, #style-toggle {
+    #toggle-lang, #capture, #share, #style-toggle, #reset {
       position: absolute;
       z-index: 10;
       background: white;
@@ -86,7 +86,7 @@
     #toggle-lang { bottom: 120px; left: 20px; font-weight: bold; }
 
     #capture {
-      bottom: 30px;
+      bottom: 120px;
       left: 50%;
       transform: translateX(-50%);
       width: 60px;
@@ -100,9 +100,9 @@
 
     #style-toggle { bottom: 120px; right: 20px; }
 
-    #share {
-      bottom: 200px; left: 20px;
-    }
+    #share { bottom: 200px; left: 20px; }
+
+    #reset { top: 20px; right: 20px; }
 
     #share:disabled {
       opacity: 0.4;
@@ -160,6 +160,7 @@
   <button id="capture">📸</button>
   <button id="style-toggle">Style</button>
   <button id="share" disabled>Share</button>
+  <button id="reset">↻ Reset</button>
 
   <script>
     const video = document.getElementById('camera-view');
@@ -254,6 +255,22 @@
       bubble.classList.add(neonClasses[currentNeonIndex]);
     });
 
+    document.getElementById('reset').addEventListener('click', resetUI);
+
+    function resetUI() {
+      bubble.style.display = 'none';
+      document.querySelectorAll('.text-option').forEach(el => el.classList.remove('selected'));
+      document.getElementById('share').disabled = true;
+
+      // Reset neon
+      bubble.classList.remove(...neonClasses);
+      currentNeonIndex = 0;
+      bubble.classList.add(neonClasses[0]);
+
+      quoteEn.textContent = '';
+      quoteKo.textContent = '';
+    }
+
     // 드래그 기능
     let isDragging = false, offsetX, offsetY;
     bubble.addEventListener('mousedown', startDrag);
@@ -345,14 +362,11 @@
       const bubbleW = bubbleRect.width * scaleX;
       const bubbleH = bubbleRect.height * scaleY;
 
-      // 말풍선 배경 생략, 텍스트 외곽선 강조
       ctx.font = `${18 * scaleY}px sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
 
       const text = (currentLang === 'en') ? quoteEn.textContent : quoteKo.textContent;
-
-      // 네온 외곽선 색 결정
       const neonColors = ["#00ff90", "#ffaa00", "#00ccff"];
       ctx.lineWidth = 4;
       ctx.strokeStyle = neonColors[currentNeonIndex];
@@ -399,8 +413,10 @@
         console.error('공유 실패:', err);
       }
 
-      document.getElementById('share').disabled = true;
+      // 공유 완료 후 UI 초기화
+      resetUI();
     });
   </script>
 </body>
 </html>
+
