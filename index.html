@@ -5,11 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Text Bubble Capture</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
       overflow: hidden;
       font-family: sans-serif;
@@ -52,13 +48,8 @@
       border: 2px solid black;
       background: #f0f0f0;
     }
-    .name-en {
-      font-weight: bold;
-    }
-    .name-ko {
-      font-size: 12px;
-      color: #555;
-    }
+    .name-en { font-weight: bold; }
+    .name-ko { font-size: 12px; color: #555; }
     #bubble-text {
       position: absolute;
       top: 50%; left: 50%;
@@ -85,9 +76,7 @@
       font-family: "Courier New", monospace !important;
       text-shadow: none !important;
     }
-    .quote-en, .quote-ko {
-      margin: 4px 0;
-    }
+    .quote-en, .quote-ko { margin: 4px 0; }
     #toggle-lang, #capture, #share, #style-toggle {
       position: absolute;
       z-index: 10;
@@ -98,81 +87,45 @@
       font-size: 14px;
       cursor: pointer;
     }
-    #toggle-lang {
-      bottom: 130px;
-      left: 20px;
-      font-weight: bold;
-    }
+    #toggle-lang { bottom: 130px; left: 20px; font-weight: bold; }
     #capture {
-      bottom: 130px;
-      right: 20px;
-      width: 60px;
-      height: 60px;
+      bottom: 130px; right: 20px;
+      width: 60px; height: 60px;
       font-size: 26px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-    #style-toggle {
-      bottom: 200px;
-      right: 20px;
-    }
-    #share {
-      bottom: 200px;
-      left: 20px;
-    }
+    #style-toggle { bottom: 200px; right: 20px; }
+    #share { bottom: 200px; left: 20px; }
   </style>
 </head>
 <body>
   <video id="camera-view" autoplay playsinline muted></video>
+
   <div class="text-carousel">
-    <div class="text-option" data-id="JohnCage">
-      <div class="name-en">John Cage</div>
-      <div class="name-ko">존 케이지</div>
-    </div>
-    <div class="text-option" data-id="AndyWarhol">
-      <div class="name-en">Andy Warhol</div>
-      <div class="name-ko">앤디 워홀</div>
-    </div>
-      <div class="text-option" data-id="Joseph">
-      <div class="name-en">Joseph Beuys</div>
-      <div class="name-ko">요셉 보이스</div>
-    </div>
-      <div class="text-option" data-id="DamienHirst">
-      <div class="name-en">Damien Hirst</div>
-      <div class="name-ko">데미안 허스트</div>
-    </div>
-      <div class="text-option" data-id="Paik">
-      <div class="name-en">Nam June Paik</div>
-      <div class="name-ko">백남준</div>
-    </div>
-      <div class="text-option" data-id="Marcel">
-      <div class="name-en">Marcel Duchamp</div>
-      <div class="name-ko">마르셀 뒤샹</div>
-    </div>
-      <div class="text-option" data-id="Abramović">
-      <div class="name-en">Marina Abramović</div>
-      <div class="name-ko">마리나 아브라모비치</div>
-    </div>
-      <div class="text-option" data-id="Donald">
-      <div class="name-en">Donald Judd</div>
-      <div class="name-ko">도널드 저드</div>
-    </div>
-      <div class="text-option" data-id="Nauman">
-      <div class="name-en">Bruce Nauman</div>
-      <div class="name-ko">브루스 나우먼</div>
-    </div>
-      <div class="text-option" data-id="Paul">
-      <div class="name-en">Paul McCarthy</div>
-      <div class="name-ko">폴 매카시</div>
+    <div class="text-option" data-id="JohnCage"><div class="name-en">John Cage</div><div class="name-ko">존 케이지</div></div>
+    <div class="text-option" data-id="AndyWarhol"><div class="name-en">Andy Warhol</div><div class="name-ko">앤디 워홀</div></div>
+    <div class="text-option" data-id="Joseph"><div class="name-en">Joseph Beuys</div><div class="name-ko">요셉 보이스</div></div>
+    <div class="text-option" data-id="DamienHirst"><div class="name-en">Damien Hirst</div><div class="name-ko">데미안 허스트</div></div>
+    <div class="text-option" data-id="Paik"><div class="name-en">Nam June Paik</div><div class="name-ko">백남준</div></div>
+    <div class="text-option" data-id="Marcel"><div class="name-en">Marcel Duchamp</div><div class="name-ko">마르셀 뒤샹</div></div>
+    <div class="text-option" data-id="Abramović"><div class="name-en">Marina Abramović</div><div class="name-ko">마리나 아브라모비치</div></div>
+    <div class="text-option" data-id="Donald"><div class="name-en">Donald Judd</div><div class="name-ko">도널드 저드</div></div>
+    <div class="text-option" data-id="Nauman"><div class="name-en">Bruce Nauman</div><div class="name-ko">브루스 나우먼</div></div>
+    <div class="text-option" data-id="Paul"><div class="name-en">Paul McCarthy</div><div class="name-ko">폴 매카시</div></div>
   </div>
+
   <div id="bubble-text">
     <div class="quote-en"></div>
     <div class="quote-ko"></div>
   </div>
+
   <button id="toggle-lang">KO / EN</button>
   <button id="capture">📸</button>
+  <button id="style-toggle">Style</button>
+  <button id="share">Share</button>
 
   <script>
     const video = document.getElementById('camera-view');
@@ -182,7 +135,7 @@
     const quotes = {
       JohnCage: {
         en: "I can't understand why people are frightened of new ideas. I'm frightened of the old ones.",
-        ko: "사람들이 왜 새로운 생각을 두려워하는지 이해할 수 없다. 나는 오래된 생각이 두렵다.",
+        ko: "사람들이 왜 새로운 생각을 두려워하는지 이해할 수 없다. 나는 오래된 생각이 두렵다."
       },
       AndyWarhol: {
         en: "An artist is somebody who produces things that people don't need to have.",
@@ -193,7 +146,7 @@
         ko: "예술은 삶을 가능하게 하는 유일한 것이다."
       },
       DamienHirst: {
-        en: "good art is when you look at it, experience it and it stays in your mind.",
+        en: "Good art is when you look at it, experience it, and it stays in your mind.",
         ko: "좋은 예술이란 그것을 보고 경험한 후에도 계속해서 마음속에 남아 있는 것이다."
       },
       Paik: {
@@ -247,8 +200,26 @@
       currentLang = (currentLang === 'en') ? 'ko' : 'en';
       updateLangVisibility();
     });
-    let isDragging = false;
-    let offsetX, offsetY;
+
+    document.getElementById('style-toggle').addEventListener('click', () => {
+      bubble.classList.toggle('bubble-style-2');
+    });
+
+    document.getElementById('share').addEventListener('click', () => {
+      const text = (currentLang === 'en') ? quoteEn.textContent : quoteKo.textContent;
+      const shareData = {
+        title: 'Art Quote',
+        text: text,
+        url: window.location.href
+      };
+      if (navigator.share) {
+        navigator.share(shareData).catch((err) => console.error('Share failed:', err));
+      } else {
+        alert("이 브라우저는 공유 기능을 지원하지 않습니다.");
+      }
+    });
+
+    let isDragging = false, offsetX, offsetY;
     bubble.addEventListener('mousedown', startDrag);
     bubble.addEventListener('touchstart', startDrag, { passive: false });
     function startDrag(e) {
@@ -287,6 +258,7 @@
       document.removeEventListener('touchmove', onDrag);
       document.removeEventListener('touchend', stopDrag);
     }
+
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
       .then(stream => video.srcObject = stream);
 
@@ -327,9 +299,9 @@
       const y = (bubbleRect.top - videoRect.top) * scaleY;
       const bubbleW = bubbleRect.width * scaleX;
       const bubbleH = bubbleRect.height * scaleY;
-      ctx.fillStyle = "rgba(0,0,0,0.7)";
+      ctx.fillStyle = window.getComputedStyle(bubble).backgroundColor;
       ctx.fillRect(x, y, bubbleW, bubbleH);
-      ctx.fillStyle = "white";
+      ctx.fillStyle = window.getComputedStyle(bubble).color;
       ctx.font = `${18 * scaleY}px sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
