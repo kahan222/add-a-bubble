@@ -50,6 +50,7 @@
     }
     .name-en { font-weight: bold; }
     .name-ko { font-size: 12px; color: #555; }
+
     #bubble-text {
       position: absolute;
       top: 50%; left: 50%;
@@ -70,12 +71,8 @@
       display: none;
       word-break: break-word;
     }
-    .bubble-style-2 {
-      background: white !important;
-      color: black !important;
-      text-shadow: none !important;
-    }
     .quote-en, .quote-ko { margin: 4px 0; }
+
     #toggle-lang, #capture, #share, #style-toggle {
       position: absolute;
       z-index: 10;
@@ -97,7 +94,13 @@
       justify-content: center;
     }
     #style-toggle { bottom: 200px; right: 20px; }
-    #share { bottom: 200px; left: 20px; }
+    #share {
+      bottom: 200px; left: 20px;
+    }
+    #share:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
@@ -124,13 +127,14 @@
   <button id="toggle-lang">KO / EN</button>
   <button id="capture">📸</button>
   <button id="style-toggle">Style</button>
-  <button id="share">Share</button>
+  <button id="share" disabled>Share</button>
 
   <script>
     const video = document.getElementById('camera-view');
     const bubble = document.getElementById('bubble-text');
     const quoteEn = document.querySelector('.quote-en');
     const quoteKo = document.querySelector('.quote-ko');
+
     const quotes = {
       JohnCage: {
         en: "I can't understand why people are frightened of new ideas. I'm frightened of the old ones.",
@@ -175,6 +179,7 @@
     };
 
     let currentLang = 'en';
+
     function updateQuote(id, optionEl) {
       const quote = quotes[id];
       if (!quote) return;
@@ -188,13 +193,16 @@
       document.querySelectorAll('.text-option').forEach(el => el.classList.remove('selected'));
       optionEl.classList.add('selected');
     }
+
     function updateLangVisibility() {
       quoteEn.style.display = (currentLang === 'en') ? 'block' : 'none';
       quoteKo.style.display = (currentLang === 'ko') ? 'block' : 'none';
     }
+
     document.querySelectorAll('.text-option').forEach(option => {
       option.addEventListener('click', () => updateQuote(option.dataset.id, option));
     });
+
     document.getElementById('toggle-lang').addEventListener('click', () => {
       currentLang = (currentLang === 'en') ? 'ko' : 'en';
       updateLangVisibility();
@@ -204,23 +212,10 @@
       bubble.classList.toggle('bubble-style-2');
     });
 
-    document.getElementById('share').addEventListener('click', () => {
-      const text = (currentLang === 'en') ? quoteEn.textContent : quoteKo.textContent;
-      const shareData = {
-        title: 'Art Quote',
-        text: text,
-        url: window.location.href
-      };
-      if (navigator.share) {
-        navigator.share(shareData).catch((err) => console.error('Share failed:', err));
-      } else {
-        alert("이 브라우저는 공유 기능을 지원하지 않습니다.");
-      }
-    });
-
     let isDragging = false, offsetX, offsetY;
     bubble.addEventListener('mousedown', startDrag);
     bubble.addEventListener('touchstart', startDrag, { passive: false });
+
     function startDrag(e) {
       isDragging = true;
       const rect = bubble.getBoundingClientRect();
@@ -233,6 +228,7 @@
       document.addEventListener('touchmove', onDrag, { passive: false });
       document.addEventListener('touchend', stopDrag);
     }
+
     function onDrag(e) {
       if (!isDragging) return;
       e.preventDefault();
@@ -250,6 +246,7 @@
       bubble.style.top = `${y}px`;
       bubble.style.transform = `translate(0, 0)`;
     }
+
     function stopDrag() {
       isDragging = false;
       document.removeEventListener('mousemove', onDrag);
@@ -260,7 +257,6 @@
 
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
       .then(stream => video.srcObject = stream);
-
     function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
       const words = text.split(' ');
       let line = '';
@@ -278,6 +274,8 @@
       ctx.fillText(line, x, y);
     }
 
+    let lastCaptureBlob = null;
+
     document.getElementById('capture').addEventListener('click', () => {
       const canvas = document.createElement('canvas');
       const width = video.videoWidth;
@@ -286,10 +284,12 @@
         alert("카메라 준비 중입니다.");
         return;
       }
+
       canvas.width = width;
       canvas.height = height;
       const ctx = canvas.getContext('2d');
       ctx.drawImage(video, 0, 0, width, height);
+
       const bubbleRect = bubble.getBoundingClientRect();
       const videoRect = video.getBoundingClientRect();
       const scaleX = width / videoRect.width;
@@ -298,18 +298,56 @@
       const y = (bubbleRect.top - videoRect.top) * scaleY;
       const bubbleW = bubbleRect.width * scaleX;
       const bubbleH = bubbleRect.height * scaleY;
+
       ctx.fillStyle = window.getComputedStyle(bubble).backgroundColor;
       ctx.fillRect(x, y, bubbleW, bubbleH);
+
       ctx.fillStyle = window.getComputedStyle(bubble).color;
       ctx.font = `${18 * scaleY}px sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
+
       const text = (currentLang === 'en') ? quoteEn.textContent : quoteKo.textContent;
-      wrapText(ctx, text, x + bubbleW/2, y + bubbleH/2 - 10, bubbleW - 20, 24 * scaleY);
-      const link = document.createElement('a');
-      link.href = canvas.toDataURL('image/png');
-      link.download = 'text-bubble-capture.png';
-      link.click();
+      wrapText(ctx, text, x + bubbleW / 2, y + bubbleH / 2 - 10, bubbleW - 20, 24 * scaleY);
+
+      // 이미지 다운로드
+      canvas.toBlob((blob) => {
+        lastCaptureBlob = blob;
+
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'text-bubble-capture.png';
+        link.click();
+
+        // 📤 Share 버튼 활성화
+        document.getElementById('share').disabled = false;
+      }, 'image/png');
+    });
+
+    document.getElementById('share').addEventListener('click', async () => {
+      if (!lastCaptureBlob) return;
+
+      const filesArray = [new File([lastCaptureBlob], 'art-quote.png', { type: 'image/png' })];
+
+      const shareData = {
+        title: 'Art Quote',
+        text: 'Here’s an art quote I captured.',
+        files: filesArray
+      };
+
+      try {
+        if (navigator.canShare && navigator.canShare({ files: filesArray })) {
+          await navigator.share(shareData);
+          alert('공유 완료!');
+        } else {
+          alert('이 브라우저는 이미지 공유를 지원하지 않습니다.');
+        }
+      } catch (err) {
+        console.error('공유 실패:', err);
+      }
+
+      // 📤 공유 후 다시 비활성화
+      document.getElementById('share').disabled = true;
     });
   </script>
 </body>
