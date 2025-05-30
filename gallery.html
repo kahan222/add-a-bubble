@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Add a Bubble - 기억 저장소</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #fafafa;
+    }
+    h1 {
+      font-size: 1.5em;
+    }
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+    .card {
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      padding: 10px;
+      background: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .card img {
+      max-width: 100%;
+      border-radius: 8px;
+    }
+    .sticker {
+      margin-top: 8px;
+      font-size: 0.9em;
+      color: #555;
+    }
+  </style>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <h1>🫧 Add a Bubble - 기억 저장소</h1>
+  <div class="gallery" id="gallery"></div>
+
+  <script>
+    // Firebase 설정
+    const firebaseConfig = {
+      apiKey: "AIzaSyCtN3FJJs73iGyRY91qvKM5-oQCDeW0qZo",
+      authDomain: "addabubble-aeeb7.firebaseapp.com",
+      projectId: "addabubble-aeeb7"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const gallery = document.getElementById("gallery");
+
+    db.collection("screenshots")
+      .orderBy("timestamp", "desc")
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          const data = doc.data();
+
+          const card = document.createElement("div");
+          card.className = "card";
+
+          const img = document.createElement("img");
+          img.src = data.imageUrl;
+          img.alt = "관객 스크린샷";
+
+          card.appendChild(img);
+          gallery.appendChild(card);
+        });
+      })
+      .catch((error) => {
+        console.error("불러오기 오류:", error);
+      });
+  </script>
+</body>
+</html>

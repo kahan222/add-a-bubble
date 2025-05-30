@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Add a Bubble 업로드 테스트</title>
+  <!-- 올바른 Firebase CDN -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <h2>🫧 Add a Bubble 업로드 테스트</h2>
+  <input type="file" id="fileInput" accept="image/*" />
+  <button onclick="uploadImage()">Upload</button>
+
+  <script>
+    // 🔑 먼저 선언: imgbb API 키
+    const imgbbApiKey = "f9427d6d511849d1476fdc31971a3b93";
+
+    // 🔧 Firebase 설정
+    const firebaseConfig = {
+      apiKey: "AIzaSyCtN3FJJs73iGyRY9IqwKM5-oQCDeW0qZo",
+      authDomain: "addabubble-aeeb7.firebaseapp.com",
+      projectId: "addabubble-aeeb7"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    async function uploadImage() {
+      const fileInput = document.getElementById("fileInput");
+      const file = fileInput.files[0];
+      if (!file) return alert("이미지를 선택하세요!");
+
+      const reader = new FileReader();
+      reader.onload = async function () {
+        const base64 = reader.result.replace(/^data:image\/[a-z]+;base64,/, "");
+
+        const formData = new FormData();
+        formData.append("key", imgbbApiKey);
+        formData.append("image", base64);
+
+        const res = await fetch("https://api.imgbb.com/1/upload", {
+          method: "POST",
+          body: formData
+        });
+        const data = await res.json();
+        const imageUrl = data.data.url;
+
+        // Firestore에 저장
+        await db.collection("screenshots").add({
+          imageUrl: imageUrl,
+          sticker: "Why so serious?",
+          timestamp: new Date().toISOString()
+        });
+
+        alert("✅ 업로드 성공!");
+        console.log("저장된 이미지 URL:", imageUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+  </script>
+</body>
+</html>
+
