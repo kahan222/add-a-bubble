@@ -402,11 +402,6 @@
         files: filesArray
       };
 
-                                                      <div style="position: fixed; bottom: 20px; left: 20px; z-index: 20;">
-  <button onclick="location.href='gallery.html'" style="padding: 6px 10px; margin-right: 8px;">📁 기억 저장소</button>
-  <button onclick="location.href='upload.html'" style="padding: 6px 10px;">🛠 업로드 테스트</button>
-</div>
-
       try {
         if (navigator.canShare && navigator.canShare({ files: filesArray })) {
           await navigator.share(shareData);
