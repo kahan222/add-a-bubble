@@ -370,7 +370,8 @@
 
     let lastCaptureBlob = null;
 
-    document.getElementById('capture').addEventListener('click', () => {
+    document.getElementById('share').addEventListener('click', async () => {
+      if (!lastCaptureBlob) return;
       const canvas = document.createElement('canvas');
       const width = video.videoWidth;
       const height = video.videoHeight;
