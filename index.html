@@ -84,7 +84,6 @@
     }
 
     #toggle-lang { bottom: 120px; left: 20px; font-weight: bold; }
-
     #capture {
       bottom: 120px;
       left: 50%;
@@ -97,13 +96,9 @@
       align-items: center;
       justify-content: center;
     }
-
     #style-toggle { bottom: 120px; right: 20px; }
-
     #share { bottom: 200px; left: 20px; }
-
     #reset { top: 20px; right: 20px; }
-
     #share:disabled {
       opacity: 0.4;
       cursor: not-allowed;
@@ -116,7 +111,6 @@
         0 0 20px #00ff90,
         0 0 40px #00ff90;
     }
-
     .bubble-style-neon-orange {
       text-shadow:
         0 0 5px #ffaa00,
@@ -124,13 +118,40 @@
         0 0 20px #ffaa00,
         0 0 40px #ffaa00;
     }
-
     .bubble-style-neon-blue {
       text-shadow:
         0 0 5px #00ccff,
         0 0 10px #00ccff,
         0 0 20px #00ccff,
         0 0 40px #00ccff;
+    }
+
+    /* 팝업 스타일 */
+    #popup {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.7);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #popup .popup-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    #popup button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -162,6 +183,16 @@
   <button id="share" disabled>Share</button>
   <button id="reset">↻ Reset</button>
 
+  <!-- 팝업 UI -->
+  <div id="popup">
+    <div class="popup-content">
+      <p>Choose an action:</p>
+      <button onclick="saveOnly()">Save Only</button>
+      <button onclick="shareOnly()">Share Only</button>
+      <button onclick="saveAndShare()">Save & Share</button>
+    </div>
+  </div>
+  
   <script>
     const video = document.getElementById('camera-view');
     const bubble = document.getElementById('bubble-text');
@@ -415,6 +446,48 @@
 
       // 공유 완료 후 UI 초기화
       resetUI();
+
+          function showPopup() {
+      document.getElementById("popup").style.display = "flex";
+    }
+
+    function hidePopup() {
+      document.getElementById("popup").style.display = "none";
+    }
+
+    function saveOnly() {
+      if (!lastCaptureBlob) return;
+      const url = URL.createObjectURL(lastCaptureBlob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "bubble.png";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      hidePopup();
+      resetUI();
+    }
+
+    function shareOnly() {
+      if (!lastCaptureBlob) return;
+      // 여기에 공유 보관함 업로드 로직 삽입 예정
+      alert("Shared to public folder (demo)");
+      hidePopup();
+      resetUI();
+    }
+
+    function saveAndShare() {
+      saveOnly();
+      shareOnly();
+    }
+
+    // 캡처 버튼 클릭 시 showPopup 호출하도록 수정
+    document.getElementById("capture").addEventListener("click", () => {
+      // 기존 캡처 로직 ...
+      showPopup();
+    });
+      
     });
   </script>
 </body>
