@@ -3,492 +3,75 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Text Bubble Capture</title>
+  <title>Add a Bubble - AR 카메라</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      overflow: hidden;
-      font-family: sans-serif;
-      background: black;
+    body { margin: 0; font-family: sans-serif; background: black; }
+    #camera-view { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -1; }
+    #btn-download, #btn-upload, #btn-share {
+      position: absolute; bottom: 100px;
+      background: white; padding: 8px 12px; border-radius: 8px; font-size: 14px; border: none;
+      z-index: 10; cursor: pointer;
     }
-    #camera-view {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
-      z-index: -1;
-    }
-    .text-carousel {
-      position: absolute;
-      bottom: 0;
-      width: 100vw;
-      height: 80px;
-      display: flex;
-      overflow-x: auto;
-      background: rgba(0,0,0,0.4);
-      padding: 6px;
-      z-index: 10;
-    }
-    .text-option {
-      background: white;
-      color: black;
-      border-radius: 12px;
-      padding: 4px 10px;
-      margin: 0 6px;
-      cursor: pointer;
-      font-size: 13px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      white-space: nowrap;
-    }
-    .text-option.selected {
-      background: #f0f0f0;
-    }
-    .name-en { font-weight: bold; }
-    .name-ko { font-size: 12px; color: #555; }
-
-    #bubble-text {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      background: transparent;
-      padding: 0;
-      border-radius: 0;
-      color: white;
-      font-size: 18px;
-      font-weight: bold;
-      max-width: 80vw;
-      text-align: center;
-      z-index: 5;
-      pointer-events: auto;
-      cursor: grab;
-      user-select: none;
-      display: none;
-      word-break: break-word;
-    }
-
-    .quote-en, .quote-ko { margin: 4px 0; }
-
-    #toggle-lang, #capture, #share, #style-toggle, #reset {
-      position: absolute;
-      z-index: 10;
-      background: white;
-      border: none;
-      border-radius: 10px;
-      padding: 6px 10px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-
-    #toggle-lang { bottom: 120px; left: 20px; font-weight: bold; }
-    #capture {
-      bottom: 120px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 60px;
-      height: 60px;
-      font-size: 25px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #style-toggle { bottom: 120px; right: 20px; }
-    #share { bottom: 200px; left: 20px; }
-    #reset { top: 20px; right: 20px; }
-    #share:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    .bubble-style-neon-green {
-      text-shadow:
-        0 0 5px #00ff90,
-        0 0 10px #00ff90,
-        0 0 20px #00ff90,
-        0 0 40px #00ff90;
-    }
-    .bubble-style-neon-orange {
-      text-shadow:
-        0 0 5px #ffaa00,
-        0 0 10px #ffaa00,
-        0 0 20px #ffaa00,
-        0 0 40px #ffaa00;
-    }
-    .bubble-style-neon-blue {
-      text-shadow:
-        0 0 5px #00ccff,
-        0 0 10px #00ccff,
-        0 0 20px #00ccff,
-        0 0 40px #00ccff;
-    }
-
-    /* 팝업 스타일 */
-    #popup {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgba(0, 0, 0, 0.7);
-      z-index: 100;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #popup .popup-content {
-      background-color: white;
-      padding: 20px;
-      border-radius: 10px;
-      text-align: center;
-    }
-    #popup button {
-      margin: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
+    #btn-download { left: 20px; }
+    #btn-upload { left: 140px; }
+    #btn-share { left: 260px; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
   </style>
 </head>
 <body>
+  <video id="camera-view" autoplay playsinline muted></video>
+  <button id="btn-download" disabled>📥 저장</button>
+  <button id="btn-upload" disabled>☁️ 업로드</button>
+  <button id="btn-share" disabled>📤 공유</button>
 
-    <video id="camera-view" autoplay playsinline muted></video>
-
-  <div class="text-carousel">
-    <div class="text-option" data-id="Han1"><div class="name-en">one sentence</div><div class="name-ko">한 문장</div></div>
-    <div class="text-option" data-id="Han2"><div class="name-en">try</div><div class="name-ko">시도</div></div>
-    <div class="text-option" data-id="Han3"><div class="name-en">life</div><div class="name-ko">삶</div></div>
-    <div class="text-option" data-id="Han4"><div class="name-en">unique</div><div class="name-ko">유일함</div></div>
-    <div class="text-option" data-id="Han5"><div class="name-en">uncomfortable</div><div class="name-ko">불편함</div></div>
-    <div class="text-option" data-id="Han6"><div class="name-en">technology</div><div class="name-ko">기술</div></div>
-    <div class="text-option" data-id="Han7"><div class="name-en">Perfect</div><div class="name-ko">완벽</div></div>
-    <div class="text-option" data-id="Han8"><div class="name-en">incomplete</div><div class="name-ko">미완성</div></div>
-    <div class="text-option" data-id="Han9"><div class="name-en">truth</div><div class="name-ko">진실</div></div>
-    <div class="text-option" data-id="Han10"><div class="name-en">thief</div><div class="name-ko">도둑</div></div>
-  </div>
-
-  <div id="bubble-text">
-    <div class="quote-en"></div>
-    <div class="quote-ko"></div>
-  </div>
-
-  <button id="toggle-lang">KO / EN</button>
-  <button id="capture">📸</button>
-  <button id="style-toggle">Style</button>
-  <button id="share" disabled>Share</button>
-  <button id="reset">↻ Reset</button>
-
-  <!-- 팝업 UI -->
-  <div id="popup">
-    <div class="popup-content">
-      <p>Choose an action:</p>
-      <button onclick="saveOnly()">Save Only</button>
-      <button onclick="shareOnly()">Share Only</button>
-      <button onclick="saveAndShare()">Save & Share</button>
-    </div>
-  </div>
-  
   <script>
-    const video = document.getElementById('camera-view');
-    const bubble = document.getElementById('bubble-text');
-    const quoteEn = document.querySelector('.quote-en');
-    const quoteKo = document.querySelector('.quote-ko');
-
-    const quotes = {
-      Han1: {
-        en: "If it can be expressed in one sentence, is it really art?",
-        ko: "한 문장으로 표현이 가능하다면, 그게 예술이 맞는가?"
-      },
-      Han2: {
-        en: "If you think you can do it too, maybe you should try.",
-        ko: "나도 할 수 있을 것 같다면, 한 번 해보는 것도 좋을듯."
-      },
-      Han3: {
-        en: "How many people truly equate art with life?",
-        ko: "예술과 삶을 동일시 하는 사람이 몇이나 되겠는가."
-      },
-      Han4: {
-        en: "If uniqueness defines art, that idea is already outdated.",
-        ko: "유일함이 예술의 특성이란 말은, 옛 말일 뿐이다."
-      },
-      Han5: {
-        en: "Uncomfortable to see, impossible to forget.",
-        ko: "불편해서 눈을 피했지만, 계속 생각나더라."
-      },
-      Han6: {
-        en: "The more technology evolves, the more extraordinary the artist becomes.",
-        ko: "기술이 발전할수록 예술가는 더 대단해진다."
-      },
-      Han7: {
-        en: "Perfect order leaves no room for imagination.",
-        ko: "완벽한 질서는 상상력을 허용하지 않는다."
-      },
-      Han8: {
-        en: "Without a viewer, it's incomplete.",
-        ko: "보는 이가 없으면, 미완성이다."
-      },
-      Han9: {
-        en: "If all you want is to speak the truth, go to a news studio, not a gallery.",
-        ko: "진실만을 말하려면, 미술관이 아니라 방송국으로 가라."
-      },
-      Han10: {
-        en: "Some works retrieve forgotten memories like a thief.",
-        ko: "어떤 작품은 잊고 있었던 기억을 도둑처럼 찾아낸다."
-      }
-    };
-
-    let currentLang = 'en';
-
-    function updateQuote(id, optionEl) {
-      const quote = quotes[id];
-      if (!quote) return;
-      quoteEn.textContent = quote.en;
-      quoteKo.textContent = quote.ko;
-      bubble.style.display = 'block';
-      bubble.style.left = '50%';
-      bubble.style.top = '50%';
-      bubble.style.transform = 'translate(-50%, -50%)';
-      updateLangVisibility();
-      document.querySelectorAll('.text-option').forEach(el => el.classList.remove('selected'));
-      optionEl.classList.add('selected');
-    }
-
-    function updateLangVisibility() {
-      quoteEn.style.display = (currentLang === 'en') ? 'block' : 'none';
-      quoteKo.style.display = (currentLang === 'ko') ? 'block' : 'none';
-    }
-
-    document.querySelectorAll('.text-option').forEach(option => {
-      option.addEventListener('click', () => updateQuote(option.dataset.id, option));
-    });
-
-    document.getElementById('toggle-lang').addEventListener('click', () => {
-      currentLang = (currentLang === 'en') ? 'ko' : 'en';
-      updateLangVisibility();
-    });
-
-    const neonClasses = [
-      'bubble-style-neon-green',
-      'bubble-style-neon-orange',
-      'bubble-style-neon-blue'
-    ];
-    let currentNeonIndex = 0;
-    bubble.classList.add(neonClasses[0]);
-
-    document.getElementById('style-toggle').addEventListener('click', () => {
-      bubble.classList.remove(neonClasses[currentNeonIndex]);
-      currentNeonIndex = (currentNeonIndex + 1) % neonClasses.length;
-      bubble.classList.add(neonClasses[currentNeonIndex]);
-    });
-
-    document.getElementById('reset').addEventListener('click', resetUI);
-
-    function resetUI() {
-      bubble.style.display = 'none';
-      document.querySelectorAll('.text-option').forEach(el => el.classList.remove('selected'));
-      document.getElementById('share').disabled = true;
-
-      // Reset neon
-      bubble.classList.remove(...neonClasses);
-      currentNeonIndex = 0;
-      bubble.classList.add(neonClasses[0]);
-
-      quoteEn.textContent = '';
-      quoteKo.textContent = '';
-    }
-
-    // 드래그 기능
-    let isDragging = false, offsetX, offsetY;
-    bubble.addEventListener('mousedown', startDrag);
-    bubble.addEventListener('touchstart', startDrag, { passive: false });
-
-    function startDrag(e) {
-      isDragging = true;
-      const rect = bubble.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      offsetX = clientX - rect.left;
-      offsetY = clientY - rect.top;
-      document.addEventListener('mousemove', onDrag);
-      document.addEventListener('mouseup', stopDrag);
-      document.addEventListener('touchmove', onDrag, { passive: false });
-      document.addEventListener('touchend', stopDrag);
-    }
-
-    function onDrag(e) {
-      if (!isDragging) return;
-      e.preventDefault();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-      const bubbleWidth = bubble.offsetWidth;
-      const bubbleHeight = bubble.offsetHeight;
-      const maxX = window.innerWidth - bubbleWidth;
-      const maxY = window.innerHeight - bubbleHeight;
-      let x = clientX - offsetX;
-      let y = clientY - offsetY;
-      x = Math.max(0, Math.min(x, maxX));
-      y = Math.max(0, Math.min(y, maxY));
-      bubble.style.left = `${x}px`;
-      bubble.style.top = `${y}px`;
-      bubble.style.transform = `translate(0, 0)`;
-    }
-
-    function stopDrag() {
-      isDragging = false;
-      document.removeEventListener('mousemove', onDrag);
-      document.removeEventListener('mouseup', stopDrag);
-      document.removeEventListener('touchmove', onDrag);
-      document.removeEventListener('touchend', stopDrag);
-    }
-
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-      .then(stream => video.srcObject = stream);
-
-        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
-      const words = text.split(' ');
-      let line = '';
-      for (let i = 0; i < words.length; i++) {
-        const testLine = line + words[i] + ' ';
-        const testWidth = ctx.measureText(testLine).width;
-        if (testWidth > maxWidth && i > 0) {
-          ctx.strokeText(line, x, y);
-          ctx.fillText(line, x, y);
-          line = words[i] + ' ';
-          y += lineHeight;
-        } else {
-          line = testLine;
-        }
-      }
-      ctx.strokeText(line, x, y);
-      ctx.fillText(line, x, y);
-    }
-
     let lastCaptureBlob = null;
+    const video = document.getElementById("camera-view");
 
-    document.getElementById('share').addEventListener('click', async () => {
-      if (!lastCaptureBlob) return;
-      const canvas = document.createElement('canvas');
-      const width = video.videoWidth;
-      const height = video.videoHeight;
-      if (!width || !height) {
-        alert("카메라 준비 중입니다.");
-        return;
-      }
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+      .then(stream => video.srcObject = stream)
+      .catch(err => console.error("카메라 오류:", err));
 
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, width, height);
-
-      const bubbleRect = bubble.getBoundingClientRect();
-      const videoRect = video.getBoundingClientRect();
-      const scaleX = width / videoRect.width;
-      const scaleY = height / videoRect.height;
-      const x = (bubbleRect.left - videoRect.left) * scaleX;
-      const y = (bubbleRect.top - videoRect.top) * scaleY;
-      const bubbleW = bubbleRect.width * scaleX;
-      const bubbleH = bubbleRect.height * scaleY;
-
-      ctx.font = `${18 * scaleY}px sans-serif`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-
-      const text = (currentLang === 'en') ? quoteEn.textContent : quoteKo.textContent;
-      const neonColors = ["#00ff90", "#ffaa00", "#00ccff"];
-      ctx.lineWidth = 4;
-      ctx.strokeStyle = neonColors[currentNeonIndex];
-      ctx.fillStyle = "white";
-
-      wrapText(ctx, text, x + bubbleW / 2, y + bubbleH / 2 - 10, bubbleW - 20, 24 * scaleY);
-
-      canvas.toBlob((blob) => {
-        if (!blob) return;
+    // 가상 캡처 시뮬레이션 (임시)
+    setTimeout(() => {
+      const canvas = document.createElement("canvas");
+      canvas.width = 640; canvas.height = 480;
+      const ctx = canvas.getContext("2d");
+      ctx.fillStyle = "black"; ctx.fillRect(0, 0, 640, 480);
+      ctx.fillStyle = "white"; ctx.font = "24px sans-serif";
+      ctx.fillText("캡처된 이미지입니다", 160, 240);
+      canvas.toBlob(blob => {
         lastCaptureBlob = blob;
-
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'text-bubble-capture.png';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-
-        document.getElementById('share').disabled = false;
+        document.getElementById('btn-download').disabled = false;
+        document.getElementById('btn-upload').disabled = false;
+        document.getElementById('btn-share').disabled = false;
       }, 'image/png');
-    });
+    }, 2000);
 
-    document.getElementById('share').addEventListener('click', async () => {
-      if (!lastCaptureBlob) return;
-
-      const filesArray = [new File([lastCaptureBlob], 'art-quote.png', { type: 'image/png' })];
-
-      const shareData = {
-        title: 'Art Quote',
-        text: 'Here’s an art quote I captured.',
-        files: filesArray
-      };
-
-      try {
-        if (navigator.canShare && navigator.canShare({ files: filesArray })) {
-          await navigator.share(shareData);
-          alert('공유 완료!');
-        } else {
-          alert('이 브라우저는 이미지 공유를 지원하지 않습니다.');
-        }
-      } catch (err) {
-        console.error('공유 실패:', err);
-      }
-
-      // 공유 완료 후 UI 초기화
-      resetUI();
-
-          function showPopup() {
-      document.getElementById("popup").style.display = "flex";
-    }
-
-    function hidePopup() {
-      document.getElementById("popup").style.display = "none";
-    }
-
-    function saveOnly() {
-      if (!lastCaptureBlob) return;
+    document.getElementById('btn-download').addEventListener('click', () => {
       const url = URL.createObjectURL(lastCaptureBlob);
-      const a = document.createElement("a");
+      const a = document.createElement('a');
       a.href = url;
-      a.download = "bubble.png";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+      a.download = 'capture.png';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
       URL.revokeObjectURL(url);
-      hidePopup();
-      resetUI();
-    }
-
-    function shareOnly() {
-      if (!lastCaptureBlob) return;
-      // 여기에 공유 보관함 업로드 로직 삽입 예정
-      alert("Shared to public folder (demo)");
-      hidePopup();
-      resetUI();
-    }
-
-    function saveAndShare() {
-      saveOnly();
-      shareOnly();
-    }
-
-    // 캡처 버튼 클릭 시 showPopup 호출하도록 수정
-    document.getElementById("capture").addEventListener("click", () => {
-      // 기존 캡처 로직 ...
-      showPopup();
     });
-      
+
+    document.getElementById('btn-upload').addEventListener('click', () => {
+      alert("Firebase 업로드 함수 호출 (여기에 연결)");
+    });
+
+    document.getElementById('btn-share').addEventListener('click', async () => {
+      const file = new File([lastCaptureBlob], 'capture.png', { type: 'image/png' });
+      const shareData = { title: 'Add a Bubble', files: [file] };
+      if (navigator.canShare && navigator.canShare(shareData)) {
+        try {
+          await navigator.share(shareData);
+          alert("공유 완료!");
+        } catch (err) { console.error(err); }
+      } else {
+        alert("이 브라우저는 공유 기능을 지원하지 않습니다.");
+      }
     });
   </script>
 </body>
