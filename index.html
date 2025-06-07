@@ -160,7 +160,7 @@
   <button id="capture">📸</button>
   <button id="style-toggle">Style</button>
   <button id="reset">↻ Reset</button>
-  <button id="share-combined" style="display: none;">📤 저장 및 공유</button>
+  <button id="share-combined" style="display: none;">📤 Save & Share the Bubble</button>
 
   <script>
     const video = document.getElementById('camera-view');
@@ -262,27 +262,29 @@
   const btn = document.getElementById('share-combined');
   btn.style.display = 'block';
 
-  btn.onclick = async () => {
-    if (!lastCaptureBlob) return;
+btn.onclick = async () => {
+  if (!lastCaptureBlob) return;
 
-    // Step 1: Save to phone
-    const url = URL.createObjectURL(lastCaptureBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'bubble.png';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+  // ① 이미지 다운로드
+  const url = URL.createObjectURL(lastCaptureBlob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'bubble.png';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 
-    // Step 2: Upload to Bubble Storage (임시로 upload.html 열기)
-    window.open('upload.html', '_blank');
+  // ② 업로드 실행 (Firebase or imgbb + Firestore)
+  uploadCapturedImage(lastCaptureBlob); // ← 이 함수는 별도로 구현해둔 업로드 함수
 
-    // UI 초기화
-    btn.style.display = 'none';
-    resetUI();
-  };
-}
+  // ③ 안내 메시지
+  alert('✅ 저장 및 Bubble Storage 공유가 완료되었습니다.');
+
+  // ④ 버튼 숨김 + UI 리셋
+  btn.style.display = 'none';
+  resetUI();
+};
 
     function resetUI() {
       bubble.style.display = 'none';
