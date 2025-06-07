@@ -160,6 +160,7 @@
   <button id="capture">📸</button>
   <button id="style-toggle">Style</button>
   <button id="reset">↻ Reset</button>
+  <button id="share-combined" style="display: none;">📤 저장 및 공유</button>
 
   <script>
     const video = document.getElementById('camera-view');
@@ -256,6 +257,32 @@
     });
 
     document.getElementById('reset').addEventListener('click', resetUI);
+
+    function showShareCombinedButton() {
+  const btn = document.getElementById('share-combined');
+  btn.style.display = 'block';
+
+  btn.onclick = async () => {
+    if (!lastCaptureBlob) return;
+
+    // Step 1: Save to phone
+    const url = URL.createObjectURL(lastCaptureBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'bubble.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    // Step 2: Upload to Bubble Storage (임시로 upload.html 열기)
+    window.open('upload.html', '_blank');
+
+    // UI 초기화
+    btn.style.display = 'none';
+    resetUI();
+  };
+}
 
     function resetUI() {
       bubble.style.display = 'none';
@@ -434,7 +461,7 @@ function showShareButton() {
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
 
-      showShareButton();  // 여기가 핵심
+      showShareCombinedButton();
   }, 'image/png');
 });
 
@@ -460,7 +487,6 @@ function showShareButton() {
         console.error('공유 실패:', err);
       }
 
-      // 공유 완료 후 UI 초기화
       resetUI();
     });
   </script>
