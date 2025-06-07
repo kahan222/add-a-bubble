@@ -344,8 +344,12 @@ btn.onclick = async () => {
       document.removeEventListener('touchend', stopDrag);
     }
 
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-      .then(stream => video.srcObject = stream);
+navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+  .then(stream => video.srcObject = stream)
+  .catch(err => {
+    console.error("❌ 카메라 접근 실패:", err);
+    alert("카메라 권한이 필요합니다. 브라우저 설정에서 카메라 접근을 허용해주세요.");
+  });
 
         function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
       const words = text.split(' ');
