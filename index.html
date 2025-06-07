@@ -258,34 +258,88 @@
 
     document.getElementById('reset').addEventListener('click', resetUI);
 
-    function showShareCombinedButton() {
-  const btn = document.getElementById('share-combined');
-  btn.style.display = 'block';
+function showShareCombinedButton() {
+  const btn = document.createElement('button');
+  btn.id = 'share-combined';
+  btn.textContent = '📤 Save & Share the Bubble';
+  btn.style = `
+    position: absolute;
+    bottom: 200px;
+    left: 20px;
+    z-index: 10;
+    background: white;
+    border: none;
+    border-radius: 10px;
+    padding: 6px 10px;
+    font-size: 14px;
+    cursor: pointer;
+  `;
 
-btn.onclick = async () => {
-  if (!lastCaptureBlob) return;
+  btn.onclick = async () => {
+    if (!lastCaptureBlob) return;
 
-  // ① 이미지 다운로드
-  const url = URL.createObjectURL(lastCaptureBlob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'bubble.png';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
+    // ① 다운로드
+    const url = URL.createObjectURL(lastCaptureBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'bubble.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
 
-  // ② 업로드 실행 (Firebase or imgbb + Firestore)
-  uploadCapturedImage(lastCaptureBlob); // ← 이 함수는 별도로 구현해둔 업로드 함수
+    // ② Bubble Storage 업로드
+    await uploadCapturedImage(lastCaptureBlob);
 
-  // ③ 안내 메시지
-  alert('✅ 저장 및 Bubble Storage 공유가 완료되었습니다.');
+    alert('✅ 저장 및 Bubble Storage 공유가 완료되었습니다.');
+    btn.remove();
+    resetUI();
+  };
 
-  // ④ 버튼 숨김 + UI 리셋
-  btn.style.display = 'none';
-  resetUI();
-};
+  document.body.appendChild(btn);
+}
 
+// 캡처 후 호출됨
+function resetUI() {
+  bubble.style.display = 'none';
+  document.querySelectorAll('.text-option').forEach(el => el.classList.remove('selected'));
+
+  // 스타일 초기화
+  bubble.classList.remove(...neonClasses);
+  currentNeonIndex = 0;
+  bubble.classList.add(neonClasses[0]);
+
+  quoteEn.textContent = '';
+  quoteKo.textContent = '';
+}
+
+// 공유용 업로드
+async function uploadCapturedImage(blob) {
+  const formData = new FormData();
+  formData.append('image', blob);
+  const imgbbApiKey = 'YOUR_KEY_HERE';
+  const imgbbEndpoint = `https://api.imgbb.com/1/upload?key=${imgbbApiKey}`;
+
+  try {
+    const response = await fetch(imgbbEndpoint, {
+      method: 'POST',
+      body: formData,
+    });
+    const result = await response.json();
+    const imageUrl = result.data.url;
+    await addToFirestore(imageUrl);
+  } catch (error) {
+    console.error('이미지 업로드 실패:', error);
+    alert('⚠️ Bubble Storage 업로드에 실패했습니다.');
+  }
+}
+
+async function addToFirestore(imageUrl) {
+  const docRef = await firebase.firestore().collection('bubbles').add({
+    imageUrl: imageUrl,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
     function resetUI() {
       bubble.style.display = 'none';
       document.querySelectorAll('.text-option').forEach(el => el.classList.remove('selected'));
