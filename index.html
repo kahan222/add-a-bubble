@@ -295,12 +295,6 @@ function showShareCombinedButton() {
     alert('✅ 저장 및 Bubble Storage 공유가 완료되었습니다.');
     btn.remove();
     resetUI();
-  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-  .then(stream => video.srcObject = stream)
-  .catch(err => {
-    console.error("❌ 카메라 접근 실패:", err);
-    alert("카메라 권한이 필요합니다. 브라우저 설정에서 카메라 접근을 허용해주세요.");
-    });
   };
 
   document.body.appendChild(btn);
@@ -348,7 +342,12 @@ async function addToFirestore(imageUrl) {
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
   });
 }
-
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    .then(stream => video.srcObject = stream)
+    .catch(err => {
+      console.error("❌ 카메라 접근 실패:", err);
+      alert("카메라 권한이 필요합니다. 브라우저 설정에서 카메라 접근을 허용해주세요.");
+    });
     // 드래그 기능
     let isDragging = false, offsetX, offsetY;
     bubble.addEventListener('mousedown', startDrag);
@@ -559,7 +558,6 @@ document.getElementById('share').onclick = async () => {
       console.error('이미지 업로드 실패:', error);
       alert('⚠️ Bubble Storage 업로드에 실패했습니다.');
     }
-  }
 
   async function addToFirestore(imageUrl) {
     const docRef = await firebase.firestore().collection('bubbles').add({
