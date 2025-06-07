@@ -3,76 +3,96 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Add a Bubble - AR 카메라</title>
+  <title>Add a Bubble - AR Camera</title>
   <style>
-    body { margin: 0; font-family: sans-serif; background: black; }
+    body { margin: 0; font-family: sans-serif; background: black; overflow: hidden; }
     #camera-view { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -1; }
-    #btn-download, #btn-upload, #btn-share {
-      position: absolute; bottom: 100px;
-      background: white; padding: 8px 12px; border-radius: 8px; font-size: 14px; border: none;
-      z-index: 10; cursor: pointer;
+    #controls {
+      position: absolute; bottom: 100px; left: 20px; z-index: 10;
+      display: flex; gap: 12px;
     }
-    #btn-download { left: 20px; }
-    #btn-upload { left: 140px; }
-    #btn-share { left: 260px; }
-    button:disabled { opacity: 0.4; cursor: not-allowed; }
+    button {
+      background: white; padding: 8px 12px; border-radius: 8px;
+      font-size: 14px; border: none; cursor: pointer;
+    }
+    button:disabled {
+      opacity: 0.4; cursor: not-allowed;
+    }
+    #capture {
+      position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%);
+      width: 60px; height: 60px; font-size: 25px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      z-index: 10;
+    }
   </style>
 </head>
 <body>
-  <video id="camera-view" autoplay playsinline muted></video>
+
+<video id="camera-view" autoplay playsinline muted></video>
+
+<button id="capture">📸</button>
+
+<div id="controls">
   <button id="btn-download" disabled>📥 저장</button>
   <button id="btn-upload" disabled>☁️ 업로드</button>
   <button id="btn-share" disabled>📤 공유</button>
+</div>
 
-  <script>
-    let lastCaptureBlob = null;
-    const video = document.getElementById("camera-view");
+<script>
+  let lastCaptureBlob = null;
+  const video = document.getElementById("camera-view");
 
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-      .then(stream => video.srcObject = stream)
-      .catch(err => console.error("카메라 오류:", err));
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+    .then(stream => video.srcObject = stream)
+    .catch(err => console.error("카메라 오류:", err));
 
-    // 가상 캡처 시뮬레이션 (임시)
-    setTimeout(() => {
-      const canvas = document.createElement("canvas");
-      canvas.width = 640; canvas.height = 480;
-      const ctx = canvas.getContext("2d");
-      ctx.fillStyle = "black"; ctx.fillRect(0, 0, 640, 480);
-      ctx.fillStyle = "white"; ctx.font = "24px sans-serif";
-      ctx.fillText("캡처된 이미지입니다", 160, 240);
-      canvas.toBlob(blob => {
-        lastCaptureBlob = blob;
-        document.getElementById('btn-download').disabled = false;
-        document.getElementById('btn-upload').disabled = false;
-        document.getElementById('btn-share').disabled = false;
-      }, 'image/png');
-    }, 2000);
+  document.getElementById("capture").addEventListener("click", () => {
+    const canvas = document.createElement("canvas");
+    const width = video.videoWidth;
+    const height = video.videoHeight;
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0, width, height);
+    canvas.toBlob(blob => {
+      lastCaptureBlob = blob;
+      document.getElementById("btn-download").disabled = false;
+      document.getElementById("btn-upload").disabled = false;
+      document.getElementById("btn-share").disabled = false;
+    }, "image/png");
+  });
 
-    document.getElementById('btn-download').addEventListener('click', () => {
-      const url = URL.createObjectURL(lastCaptureBlob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'capture.png';
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    });
+  document.getElementById("btn-download").addEventListener("click", () => {
+    const url = URL.createObjectURL(lastCaptureBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "capture.png";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
 
-    document.getElementById('btn-upload').addEventListener('click', () => {
-      alert("Firebase 업로드 함수 호출 (여기에 연결)");
-    });
+  document.getElementById("btn-upload").addEventListener("click", () => {
+    alert("Firebase 업로드 로직 연결 필요");
+  });
 
-    document.getElementById('btn-share').addEventListener('click', async () => {
-      const file = new File([lastCaptureBlob], 'capture.png', { type: 'image/png' });
-      const shareData = { title: 'Add a Bubble', files: [file] };
-      if (navigator.canShare && navigator.canShare(shareData)) {
-        try {
-          await navigator.share(shareData);
-          alert("공유 완료!");
-        } catch (err) { console.error(err); }
-      } else {
-        alert("이 브라우저는 공유 기능을 지원하지 않습니다.");
+  document.getElementById("btn-share").addEventListener("click", async () => {
+    if (!lastCaptureBlob) return;
+    const file = new File([lastCaptureBlob], "capture.png", { type: "image/png" });
+    const shareData = { title: "Add a Bubble", files: [file] };
+    if (navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+        alert("공유 완료!");
+      } catch (err) {
+        console.error(err);
       }
-    });
-  </script>
+    } else {
+      alert("이 브라우저는 공유 기능을 지원하지 않습니다.");
+    }
+  });
+</script>
+
 </body>
 </html>
