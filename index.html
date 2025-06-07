@@ -300,18 +300,19 @@ function showShareCombinedButton() {
   document.body.appendChild(btn);
 }
 
-// 캡처 후 호출됨
 function resetUI() {
   bubble.style.display = 'none';
   document.querySelectorAll('.text-option').forEach(el => el.classList.remove('selected'));
 
-  // 스타일 초기화
   bubble.classList.remove(...neonClasses);
   currentNeonIndex = 0;
   bubble.classList.add(neonClasses[0]);
 
   quoteEn.textContent = '';
   quoteKo.textContent = '';
+
+  document.getElementById('save').style.display = 'none';
+  document.getElementById('share').style.display = 'none';
 }
 
 // 공유용 업로드
@@ -341,19 +342,6 @@ async function addToFirestore(imageUrl) {
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
   });
 }
-    function resetUI() {
-      bubble.style.display = 'none';
-      document.querySelectorAll('.text-option').forEach(el => el.classList.remove('selected'));
-      document.getElementById('share').disabled = true;
-
-      // Reset neon
-      bubble.classList.remove(...neonClasses);
-      currentNeonIndex = 0;
-      bubble.classList.add(neonClasses[0]);
-
-      quoteEn.textContent = '';
-      quoteKo.textContent = '';
-    }
 
     // 드래그 기능
     let isDragging = false, offsetX, offsetY;
