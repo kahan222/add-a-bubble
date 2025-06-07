@@ -334,7 +334,6 @@ async function uploadCapturedImage(blob) {
     console.error('이미지 업로드 실패:', error);
     alert('⚠️ Bubble Storage 업로드에 실패했습니다.');
   }
-}
 
 async function addToFirestore(imageUrl) {
   const docRef = await firebase.firestore().collection('bubbles').add({
@@ -342,12 +341,6 @@ async function addToFirestore(imageUrl) {
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
   });
 }
-      navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-    .then(stream => video.srcObject = stream)
-    .catch(err => {
-      console.error("❌ 카메라 접근 실패:", err);
-      alert("카메라 권한이 필요합니다. 브라우저 설정에서 카메라 접근을 허용해주세요.");
-    });
     // 드래그 기능
     let isDragging = false, offsetX, offsetY;
     bubble.addEventListener('mousedown', startDrag);
@@ -563,6 +556,16 @@ document.getElementById('share').onclick = async () => {
     const docRef = await firebase.firestore().collection('bubbles').add({
       imageUrl: imageUrl,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
+
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+    .then(stream => {
+      const video = document.getElementById('camera-view');
+      video.srcObject = stream;
+    })
+    .catch(err => {
+      console.error("❌ 카메라 접근 실패:", err);
+      alert("카메라 권한이 필요합니다. 브라우저 설정에서 허용해주세요.");
+    }
     });
   </script>
 </body>
