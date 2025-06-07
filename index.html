@@ -159,7 +159,6 @@
   <button id="toggle-lang">KO / EN</button>
   <button id="capture">📸</button>
   <button id="style-toggle">Style</button>
-  <button id="share" disabled>Share</button>
   <button id="reset">↻ Reset</button>
 
   <script>
@@ -338,6 +337,53 @@
       ctx.fillText(line, x, y);
     }
 
+function showShareButton() {
+  const old = document.getElementById('share');
+  if (old) old.remove();
+
+  const shareBtn = document.createElement('button');
+  shareBtn.id = 'share';
+  shareBtn.textContent = 'Share';
+  shareBtn.style.position = 'absolute';
+  shareBtn.style.bottom = '200px';
+  shareBtn.style.left = '20px';
+  shareBtn.style.zIndex = 10;
+  shareBtn.style.background = 'white';
+  shareBtn.style.border = 'none';
+  shareBtn.style.borderRadius = '10px';
+  shareBtn.style.padding = '6px 10px';
+  shareBtn.style.fontSize = '14px';
+  shareBtn.style.cursor = 'pointer';
+
+  shareBtn.addEventListener('click', async () => {
+    if (!lastCaptureBlob) return;
+
+    const filesArray = [new File([lastCaptureBlob], 'art-quote.png', { type: 'image/png' })];
+    const shareData = {
+      title: 'Art Quote',
+      text: 'Here’s an art quote I captured.',
+      files: filesArray
+    };
+
+    try {
+      if (navigator.canShare && navigator.canShare({ files: filesArray })) {
+        await navigator.share(shareData);
+        alert('공유 완료!');
+      } else {
+        alert('이 브라우저는 이미지 공유를 지원하지 않습니다.');
+      }
+    } catch (err) {
+      console.error('공유 실패:', err);
+    }
+
+    // 버튼 제거 및 UI 리셋
+    shareBtn.remove();
+    resetUI();
+  });
+
+  document.body.appendChild(shareBtn);
+}
+    
     let lastCaptureBlob = null;
 
     document.getElementById('capture').addEventListener('click', () => {
@@ -375,22 +421,22 @@
 
       wrapText(ctx, text, x + bubbleW / 2, y + bubbleH / 2 - 10, bubbleW - 20, 24 * scaleY);
 
-      canvas.toBlob((blob) => {
-        if (!blob) return;
-        lastCaptureBlob = blob;
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      lastCaptureBlob = blob;
 
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = 'text-bubble-capture.png';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'text-bubble-capture.png';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
 
-        document.getElementById('share').disabled = false;
-      }, 'image/png');
-    });
+      showShareButton();  // 여기가 핵심
+  }, 'image/png');
+});
 
     document.getElementById('share').addEventListener('click', async () => {
       if (!lastCaptureBlob) return;
