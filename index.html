@@ -1,28 +1,148 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Add a Bubble - AR Camera</title>
+  <title>Add a Bubble - Final</title>
   <style>
-    body { margin: 0; font-family: sans-serif; background: black; overflow: hidden; }
-    #camera-view { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -1; }
-    #controls {
-      position: absolute; bottom: 100px; left: 20px; z-index: 10;
-      display: flex; gap: 12px;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      overflow: hidden;
+      font-family: sans-serif;
+      background: black;
     }
-    button {
-      background: white; padding: 8px 12px; border-radius: 8px;
-      font-size: 14px; border: none; cursor: pointer;
+    #camera-view {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: -1;
     }
-    button:disabled {
-      opacity: 0.4; cursor: not-allowed;
-    }
-    #capture {
-      position: absolute; bottom: 120px; left: 50%; transform: translateX(-50%);
-      width: 60px; height: 60px; font-size: 25px;
-      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    .text-carousel {
+      position: absolute;
+      bottom: 0;
+      width: 100vw;
+      height: 80px;
+      display: flex;
+      overflow-x: auto;
+      background: rgba(0,0,0,0.4);
+      padding: 6px;
       z-index: 10;
+    }
+    .text-option {
+      background: white;
+      color: black;
+      border-radius: 12px;
+      padding: 4px 10px;
+      margin: 0 6px;
+      cursor: pointer;
+      font-size: 13px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+    .text-option.selected {
+      background: #f0f0f0;
+    }
+    .name-en { font-weight: bold; }
+    .name-ko { font-size: 12px; color: #555; }
+
+    #bubble-text {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      background: transparent;
+      padding: 0;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      max-width: 80vw;
+      text-align: center;
+      z-index: 5;
+      pointer-events: auto;
+      cursor: grab;
+      user-select: none;
+      display: none;
+      word-break: break-word;
+    }
+
+    .quote-en, .quote-ko { margin: 4px 0; }
+
+    #toggle-lang, #capture, #reset, #style-toggle {
+      position: absolute;
+      z-index: 10;
+      background: white;
+      border: none;
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    #toggle-lang { bottom: 120px; left: 20px; font-weight: bold; }
+    #capture {
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 60px;
+      font-size: 25px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #style-toggle { bottom: 120px; right: 20px; }
+    #reset { top: 20px; right: 20px; }
+
+    #share-group {
+      position: absolute;
+      bottom: 200px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 10;
+    }
+
+    .share-btn {
+      background: white;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .share-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .bubble-style-neon-green {
+      text-shadow:
+        0 0 5px #00ff90,
+        0 0 10px #00ff90,
+        0 0 20px #00ff90,
+        0 0 40px #00ff90;
+    }
+    .bubble-style-neon-orange {
+      text-shadow:
+        0 0 5px #ffaa00,
+        0 0 10px #ffaa00,
+        0 0 20px #ffaa00,
+        0 0 40px #ffaa00;
+    }
+    .bubble-style-neon-blue {
+      text-shadow:
+        0 0 5px #00ccff,
+        0 0 10px #00ccff,
+        0 0 20px #00ccff,
+        0 0 40px #00ccff;
     }
   </style>
 </head>
@@ -30,68 +150,164 @@
 
 <video id="camera-view" autoplay playsinline muted></video>
 
-<button id="capture">📸</button>
-
-<div id="controls">
-  <button id="btn-download" disabled>📥 저장</button>
-  <button id="btn-upload" disabled>☁️ 업로드</button>
-  <button id="btn-share" disabled>📤 공유</button>
+<div class="text-carousel">
+  <div class="text-option" data-id="Han1"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+  <div class="text-option" data-id="Han2"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
 </div>
 
+<div id="bubble-text">
+  <div class="quote-en"></div>
+  <div class="quote-ko"></div>
+</div>
+
+<div id="share-group">
+  <button class="share-btn" id="btn-download" disabled>📥 저장</button>
+  <button class="share-btn" id="btn-upload" disabled>☁️ 업로드</button>
+  <button class="share-btn" id="btn-share" disabled>📤 공유</button>
+</div>
+
+<button id="toggle-lang">KO / EN</button>
+<button id="capture">📸</button>
+<button id="style-toggle">Style</button>
+<button id="reset">↻ Reset</button>
+
 <script>
-  let lastCaptureBlob = null;
-  const video = document.getElementById("camera-view");
-
-  navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-    .then(stream => video.srcObject = stream)
-    .catch(err => console.error("카메라 오류:", err));
-
-  document.getElementById("capture").addEventListener("click", () => {
-    const canvas = document.createElement("canvas");
-    const width = video.videoWidth;
-    const height = video.videoHeight;
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(video, 0, 0, width, height);
-    canvas.toBlob(blob => {
-      lastCaptureBlob = blob;
-      document.getElementById("btn-download").disabled = false;
-      document.getElementById("btn-upload").disabled = false;
-      document.getElementById("btn-share").disabled = false;
-    }, "image/png");
+const video = document.getElementById('camera-view');
+const bubble = document.getElementById('bubble-text');
+const quoteEn = document.querySelector('.quote-en');
+const quoteKo = document.querySelector('.quote-ko');
+const quotes = {
+  Han1: {
+    en: "If it can be expressed in one sentence, is it really art?",
+    ko: "한 문장으로 표현이 가능하다면, 그게 예술이 맞는가?"
+  },
+  Han2: {
+    en: "Try it if you think you can.",
+    ko: "나도 할 수 있을 것 같다면, 한 번 해보는 것도 좋을듯."
+  }
+};
+let currentLang = 'en';
+document.querySelectorAll('.text-option').forEach(option => {
+  option.addEventListener('click', () => {
+    const id = option.dataset.id;
+    quoteEn.textContent = quotes[id].en;
+    quoteKo.textContent = quotes[id].ko;
+    bubble.style.display = 'block';
+    bubble.style.left = '50%';
+    bubble.style.top = '50%';
+    bubble.style.transform = 'translate(-50%, -50%)';
+    updateLangVisibility();
+    document.querySelectorAll('.text-option').forEach(el => el.classList.remove('selected'));
+    option.classList.add('selected');
   });
+});
+function updateLangVisibility() {
+  quoteEn.style.display = (currentLang === 'en') ? 'block' : 'none';
+  quoteKo.style.display = (currentLang === 'ko') ? 'block' : 'none';
+}
+document.getElementById('toggle-lang').addEventListener('click', () => {
+  currentLang = (currentLang === 'en') ? 'ko' : 'en';
+  updateLangVisibility();
+});
+const neonClasses = ['bubble-style-neon-green', 'bubble-style-neon-orange', 'bubble-style-neon-blue'];
+let currentNeonIndex = 0;
+bubble.classList.add(neonClasses[0]);
+document.getElementById('style-toggle').addEventListener('click', () => {
+  bubble.classList.remove(neonClasses[currentNeonIndex]);
+  currentNeonIndex = (currentNeonIndex + 1) % neonClasses.length;
+  bubble.classList.add(neonClasses[currentNeonIndex]);
+});
+let isDragging = false, offsetX, offsetY;
+bubble.addEventListener('mousedown', startDrag);
+bubble.addEventListener('touchstart', startDrag, { passive: false });
+function startDrag(e) {
+  isDragging = true;
+  const rect = bubble.getBoundingClientRect();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  offsetX = clientX - rect.left;
+  offsetY = clientY - rect.top;
+  document.addEventListener('mousemove', onDrag);
+  document.addEventListener('mouseup', stopDrag);
+  document.addEventListener('touchmove', onDrag, { passive: false });
+  document.addEventListener('touchend', stopDrag);
+}
+function onDrag(e) {
+  if (!isDragging) return;
+  e.preventDefault();
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  let x = clientX - offsetX;
+  let y = clientY - offsetY;
+  x = Math.max(0, Math.min(x, window.innerWidth - bubble.offsetWidth));
+  y = Math.max(0, Math.min(y, window.innerHeight - bubble.offsetHeight));
+  bubble.style.left = `${x}px`;
+  bubble.style.top = `${y}px`;
+  bubble.style.transform = `translate(0, 0)`;
+}
+function stopDrag() {
+  isDragging = false;
+  document.removeEventListener('mousemove', onDrag);
+  document.removeEventListener('mouseup', stopDrag);
+  document.removeEventListener('touchmove', onDrag);
+  document.removeEventListener('touchend', stopDrag);
+}
+navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+  .then(stream => video.srcObject = stream);
 
-  document.getElementById("btn-download").addEventListener("click", () => {
-    const url = URL.createObjectURL(lastCaptureBlob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "capture.png";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+let lastCaptureBlob = null;
+document.getElementById('capture').addEventListener('click', () => {
+  const canvas = document.createElement('canvas');
+  const width = video.videoWidth;
+  const height = video.videoHeight;
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, width, height);
+  canvas.toBlob(blob => {
+    lastCaptureBlob = blob;
+    document.getElementById("btn-download").disabled = false;
+    document.getElementById("btn-upload").disabled = false;
+    document.getElementById("btn-share").disabled = false;
   });
-
-  document.getElementById("btn-upload").addEventListener("click", () => {
-    alert("Firebase 업로드 로직 연결 필요");
-  });
-
-  document.getElementById("btn-share").addEventListener("click", async () => {
-    if (!lastCaptureBlob) return;
-    const file = new File([lastCaptureBlob], "capture.png", { type: "image/png" });
-    const shareData = { title: "Add a Bubble", files: [file] };
-    if (navigator.canShare && navigator.canShare(shareData)) {
-      try {
-        await navigator.share(shareData);
-        alert("공유 완료!");
-      } catch (err) {
-        console.error(err);
-      }
-    } else {
-      alert("이 브라우저는 공유 기능을 지원하지 않습니다.");
+});
+document.getElementById("btn-download").addEventListener("click", () => {
+  const url = URL.createObjectURL(lastCaptureBlob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "capture.png";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+document.getElementById("btn-upload").addEventListener("click", () => {
+  alert("업로드 기능은 아직 구현되지 않았습니다.");
+});
+document.getElementById("btn-share").addEventListener("click", async () => {
+  if (!lastCaptureBlob) return;
+  const file = new File([lastCaptureBlob], "capture.png", { type: "image/png" });
+  const shareData = { files: [file] };
+  if (navigator.canShare && navigator.canShare(shareData)) {
+    try {
+      await navigator.share(shareData);
+      alert("공유 완료!");
+    } catch (err) {
+      console.error("공유 실패", err);
     }
-  });
+  } else {
+    alert("공유 기능을 지원하지 않는 브라우저입니다.");
+  }
+});
+document.getElementById("reset").addEventListener("click", () => {
+  bubble.style.display = 'none';
+  document.querySelectorAll('.text-option').forEach(el => el.classList.remove('selected'));
+  quoteEn.textContent = '';
+  quoteKo.textContent = '';
+  document.getElementById("btn-download").disabled = true;
+  document.getElementById("btn-upload").disabled = true;
+  document.getElementById("btn-share").disabled = true;
+});
 </script>
 
 </body>
