@@ -160,7 +160,8 @@
   <button id="capture">📸</button>
   <button id="style-toggle">Style</button>
   <button id="reset">↻ Reset</button>
-  <button id="share-combined" style="display: none;">📤 Save & Share the Bubble</button>
+  <button id="save" style="display: none; position: absolute; bottom: 60px; left: 20px;">Save</button>
+  <button id="share" style="display: none; position: absolute; bottom: 60px; right: 20px;">Share the Bubble</button>
 
   <script>
     const video = document.getElementById('camera-view');
@@ -508,9 +509,10 @@ function showShareButton() {
 
       wrapText(ctx, text, x + bubbleW / 2, y + bubbleH / 2 - 10, bubbleW - 20, 24 * scaleY);
 
-    canvas.toBlob((blob) => {
-      if (!blob) return;
-      lastCaptureBlob = blob;
+canvas.toBlob(blob => {
+  lastBlob = blob;
+  document.getElementById('save').style.display = 'inline-block';
+  document.getElementById('share').style.display = 'inline-block';
 
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -525,27 +527,28 @@ function showShareButton() {
   }, 'image/png');
 });
 
-    document.getElementById('share').addEventListener('click', async () => {
-      if (!lastCaptureBlob) return;
+document.getElementById('save').onclick = () => {
+  if (!lastBlob) return;
+  const url = URL.createObjectURL(lastBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'bubble.png';
+  a.click();
+  URL.revokeObjectURL(url);
+};
 
-      const filesArray = [new File([lastCaptureBlob], 'art-quote.png', { type: 'image/png' })];
-
-      const shareData = {
-        title: 'Art Quote',
-        text: 'Here’s an art quote I captured.',
-        files: filesArray
-      };
-
-      try {
-        if (navigator.canShare && navigator.canShare({ files: filesArray })) {
-          await navigator.share(shareData);
-          alert('공유 완료!');
-        } else {
-          alert('이 브라우저는 이미지 공유를 지원하지 않습니다.');
-        }
-      } catch (err) {
-        console.error('공유 실패:', err);
-      }
+document.getElementById('share').onclick = async () => {
+  if (!lastBlob) return;
+  const file = new File([lastBlob], 'bubble.png', { type: 'image/png' });
+  try {
+    await navigator.share({
+      title: 'Bubble',
+      text: 'Check this out',
+      files: [file]
+    });
+  } catch (e) {
+    alert('공유에 실패했습니다.');
+  }
 
   async function uploadCapturedImage(blob) {
     const formData = new FormData();
