@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Add a Bubble - Final</title>
+  <title>Text Bubble Capture</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
@@ -57,6 +56,7 @@
       transform: translate(-50%, -50%);
       background: transparent;
       padding: 0;
+      border-radius: 0;
       color: white;
       font-size: 18px;
       font-weight: bold;
@@ -72,7 +72,7 @@
 
     .quote-en, .quote-ko { margin: 4px 0; }
 
-    #toggle-lang, #capture, #reset, #style-toggle {
+    #toggle-lang, #capture, #share, #style-toggle, #reset {
       position: absolute;
       z-index: 10;
       background: white;
@@ -84,6 +84,7 @@
     }
 
     #toggle-lang { bottom: 120px; left: 20px; font-weight: bold; }
+
     #capture {
       bottom: 120px;
       left: 50%;
@@ -96,29 +97,14 @@
       align-items: center;
       justify-content: center;
     }
+
     #style-toggle { bottom: 120px; right: 20px; }
+
+    #share { bottom: 200px; left: 20px; }
+
     #reset { top: 20px; right: 20px; }
 
-    #share-group {
-      position: absolute;
-      bottom: 200px;
-      left: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      z-index: 10;
-    }
-
-    .share-btn {
-      background: white;
-      border: none;
-      border-radius: 8px;
-      padding: 6px 10px;
-      font-size: 13px;
-      cursor: pointer;
-    }
-
-    .share-btn:disabled {
+    #share:disabled {
       opacity: 0.4;
       cursor: not-allowed;
     }
@@ -130,6 +116,7 @@
         0 0 20px #00ff90,
         0 0 40px #00ff90;
     }
+
     .bubble-style-neon-orange {
       text-shadow:
         0 0 5px #ffaa00,
@@ -137,6 +124,7 @@
         0 0 20px #ffaa00,
         0 0 40px #ffaa00;
     }
+
     .bubble-style-neon-blue {
       text-shadow:
         0 0 5px #00ccff,
@@ -148,167 +136,286 @@
 </head>
 <body>
 
-<video id="camera-view" autoplay playsinline muted></video>
+    <video id="camera-view" autoplay playsinline muted></video>
 
-<div class="text-carousel">
-  <div class="text-option" data-id="Han1"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
-  <div class="text-option" data-id="Han2"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
-</div>
+  <div class="text-carousel">
+    <div class="text-option" data-id="Han1"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han2"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han3"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han4"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han5"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han6"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han7"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han8"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han9"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han10"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+  </div>
 
-<div id="bubble-text">
-  <div class="quote-en"></div>
-  <div class="quote-ko"></div>
-</div>
+  <div id="bubble-text">
+    <div class="quote-en"></div>
+    <div class="quote-ko"></div>
+  </div>
 
-<div id="share-group">
-  <button class="share-btn" id="btn-download" disabled>📥 저장</button>
-  <button class="share-btn" id="btn-upload" disabled>☁️ 업로드</button>
-  <button class="share-btn" id="btn-share" disabled>📤 공유</button>
-</div>
+  <button id="toggle-lang">KO / EN</button>
+  <button id="capture">📸</button>
+  <button id="style-toggle">Style</button>
+  <button id="share" disabled>Share</button>
+  <button id="reset">↻ Reset</button>
 
-<button id="toggle-lang">KO / EN</button>
-<button id="capture">📸</button>
-<button id="style-toggle">Style</button>
-<button id="reset">↻ Reset</button>
+  <script>
+    const video = document.getElementById('camera-view');
+    const bubble = document.getElementById('bubble-text');
+    const quoteEn = document.querySelector('.quote-en');
+    const quoteKo = document.querySelector('.quote-ko');
 
-<script>
-const video = document.getElementById('camera-view');
-const bubble = document.getElementById('bubble-text');
-const quoteEn = document.querySelector('.quote-en');
-const quoteKo = document.querySelector('.quote-ko');
-const quotes = {
-  Han1: {
-    en: "If it can be expressed in one sentence, is it really art?",
-    ko: "한 문장으로 표현이 가능하다면, 그게 예술이 맞는가?"
-  },
-  Han2: {
-    en: "Try it if you think you can.",
-    ko: "나도 할 수 있을 것 같다면, 한 번 해보는 것도 좋을듯."
-  }
-};
-let currentLang = 'en';
-document.querySelectorAll('.text-option').forEach(option => {
-  option.addEventListener('click', () => {
-    const id = option.dataset.id;
-    quoteEn.textContent = quotes[id].en;
-    quoteKo.textContent = quotes[id].ko;
-    bubble.style.display = 'block';
-    bubble.style.left = '50%';
-    bubble.style.top = '50%';
-    bubble.style.transform = 'translate(-50%, -50%)';
-    updateLangVisibility();
-    document.querySelectorAll('.text-option').forEach(el => el.classList.remove('selected'));
-    option.classList.add('selected');
-  });
-});
-function updateLangVisibility() {
-  quoteEn.style.display = (currentLang === 'en') ? 'block' : 'none';
-  quoteKo.style.display = (currentLang === 'ko') ? 'block' : 'none';
-}
-document.getElementById('toggle-lang').addEventListener('click', () => {
-  currentLang = (currentLang === 'en') ? 'ko' : 'en';
-  updateLangVisibility();
-});
-const neonClasses = ['bubble-style-neon-green', 'bubble-style-neon-orange', 'bubble-style-neon-blue'];
-let currentNeonIndex = 0;
-bubble.classList.add(neonClasses[0]);
-document.getElementById('style-toggle').addEventListener('click', () => {
-  bubble.classList.remove(neonClasses[currentNeonIndex]);
-  currentNeonIndex = (currentNeonIndex + 1) % neonClasses.length;
-  bubble.classList.add(neonClasses[currentNeonIndex]);
-});
-let isDragging = false, offsetX, offsetY;
-bubble.addEventListener('mousedown', startDrag);
-bubble.addEventListener('touchstart', startDrag, { passive: false });
-function startDrag(e) {
-  isDragging = true;
-  const rect = bubble.getBoundingClientRect();
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  offsetX = clientX - rect.left;
-  offsetY = clientY - rect.top;
-  document.addEventListener('mousemove', onDrag);
-  document.addEventListener('mouseup', stopDrag);
-  document.addEventListener('touchmove', onDrag, { passive: false });
-  document.addEventListener('touchend', stopDrag);
-}
-function onDrag(e) {
-  if (!isDragging) return;
-  e.preventDefault();
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  let x = clientX - offsetX;
-  let y = clientY - offsetY;
-  x = Math.max(0, Math.min(x, window.innerWidth - bubble.offsetWidth));
-  y = Math.max(0, Math.min(y, window.innerHeight - bubble.offsetHeight));
-  bubble.style.left = `${x}px`;
-  bubble.style.top = `${y}px`;
-  bubble.style.transform = `translate(0, 0)`;
-}
-function stopDrag() {
-  isDragging = false;
-  document.removeEventListener('mousemove', onDrag);
-  document.removeEventListener('mouseup', stopDrag);
-  document.removeEventListener('touchmove', onDrag);
-  document.removeEventListener('touchend', stopDrag);
-}
-navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-  .then(stream => video.srcObject = stream);
+    const quotes = {
+      Han1: {
+        en: "If it can be expressed in one sentence, is it really art?",
+        ko: "한 문장으로 표현이 가능하다면, 그게 예술이 맞는가?"
+      },
+      Han2: {
+        en: "If you think you can do it too, maybe you should try.",
+        ko: "나도 할 수 있을 것 같다면, 한 번 해보는 것도 좋을듯."
+      },
+      Han3: {
+        en: "How many people truly equate art with life?",
+        ko: "예술과 삶을 동일시 하는 사람이 몇이나 되겠는가."
+      },
+      Han4: {
+        en: "If uniqueness defines art, that idea is already outdated.",
+        ko: "유일함이 예술의 특성이라면, 옛 말일 뿐이다."
+      },
+      Han5: {
+        en: "It made me look away—then look again.",
+        ko: "불편해서 눈을 돌렸다가 다시 쳐다보게 되었다."
+      },
+      Han6: {
+        en: "The more technology evolves, the more extraordinary the artist becomes.",
+        ko: "기술이 발전할수록 예술가는 대단해진다."
+      },
+      Han7: {
+        en: "The more orderly the work, the narrower the viewer’s thoughts.",
+        ko: "질서가 정연할수록 관객은 한 방향만 생각한다."
+      },
+      Han8: {
+        en: "Without someone to see it, is it still complete?",
+        ko: "보는 사람이 없으면, 미완성이 아닐까."
+      },
+      Han9: {
+        en: "If all you want is to speak the truth, go to a news studio, not a gallery.",
+        ko: "진실만을 말하려면, 미술관이 아니라 방송국으로 가라."
+      },
+      Han10: {
+        en: "Some works steal back memories you thought you had forgotten.",
+        ko: "어떤 작품은 잊고 있었던 기억을 도둑처럼 찾아낸다."
+      }
+    };
 
-let lastCaptureBlob = null;
-document.getElementById('capture').addEventListener('click', () => {
-  const canvas = document.createElement('canvas');
-  const width = video.videoWidth;
-  const height = video.videoHeight;
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0, width, height);
-  canvas.toBlob(blob => {
-    lastCaptureBlob = blob;
-    document.getElementById("btn-download").disabled = false;
-    document.getElementById("btn-upload").disabled = false;
-    document.getElementById("btn-share").disabled = false;
-  });
-});
-document.getElementById("btn-download").addEventListener("click", () => {
-  const url = URL.createObjectURL(lastCaptureBlob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "capture.png";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-});
-document.getElementById("btn-upload").addEventListener("click", () => {
-  alert("업로드 기능은 아직 구현되지 않았습니다.");
-});
-document.getElementById("btn-share").addEventListener("click", async () => {
-  if (!lastCaptureBlob) return;
-  const file = new File([lastCaptureBlob], "capture.png", { type: "image/png" });
-  const shareData = { files: [file] };
-  if (navigator.canShare && navigator.canShare(shareData)) {
-    try {
-      await navigator.share(shareData);
-      alert("공유 완료!");
-    } catch (err) {
-      console.error("공유 실패", err);
+    let currentLang = 'en';
+
+    function updateQuote(id, optionEl) {
+      const quote = quotes[id];
+      if (!quote) return;
+      quoteEn.textContent = quote.en;
+      quoteKo.textContent = quote.ko;
+      bubble.style.display = 'block';
+      bubble.style.left = '50%';
+      bubble.style.top = '50%';
+      bubble.style.transform = 'translate(-50%, -50%)';
+      updateLangVisibility();
+      document.querySelectorAll('.text-option').forEach(el => el.classList.remove('selected'));
+      optionEl.classList.add('selected');
     }
-  } else {
-    alert("공유 기능을 지원하지 않는 브라우저입니다.");
-  }
-});
-document.getElementById("reset").addEventListener("click", () => {
-  bubble.style.display = 'none';
-  document.querySelectorAll('.text-option').forEach(el => el.classList.remove('selected'));
-  quoteEn.textContent = '';
-  quoteKo.textContent = '';
-  document.getElementById("btn-download").disabled = true;
-  document.getElementById("btn-upload").disabled = true;
-  document.getElementById("btn-share").disabled = true;
-});
-</script>
 
+    function updateLangVisibility() {
+      quoteEn.style.display = (currentLang === 'en') ? 'block' : 'none';
+      quoteKo.style.display = (currentLang === 'ko') ? 'block' : 'none';
+    }
+
+    document.querySelectorAll('.text-option').forEach(option => {
+      option.addEventListener('click', () => updateQuote(option.dataset.id, option));
+    });
+
+    document.getElementById('toggle-lang').addEventListener('click', () => {
+      currentLang = (currentLang === 'en') ? 'ko' : 'en';
+      updateLangVisibility();
+    });
+
+    const neonClasses = [
+      'bubble-style-neon-green',
+      'bubble-style-neon-orange',
+      'bubble-style-neon-blue'
+    ];
+    let currentNeonIndex = 0;
+    bubble.classList.add(neonClasses[0]);
+
+    document.getElementById('style-toggle').addEventListener('click', () => {
+      bubble.classList.remove(neonClasses[currentNeonIndex]);
+      currentNeonIndex = (currentNeonIndex + 1) % neonClasses.length;
+      bubble.classList.add(neonClasses[currentNeonIndex]);
+    });
+
+    document.getElementById('reset').addEventListener('click', resetUI);
+
+    function resetUI() {
+      bubble.style.display = 'none';
+      document.querySelectorAll('.text-option').forEach(el => el.classList.remove('selected'));
+      document.getElementById('share').disabled = true;
+
+      // Reset neon
+      bubble.classList.remove(...neonClasses);
+      currentNeonIndex = 0;
+      bubble.classList.add(neonClasses[0]);
+
+      quoteEn.textContent = '';
+      quoteKo.textContent = '';
+    }
+
+    // 드래그 기능
+    let isDragging = false, offsetX, offsetY;
+    bubble.addEventListener('mousedown', startDrag);
+    bubble.addEventListener('touchstart', startDrag, { passive: false });
+
+    function startDrag(e) {
+      isDragging = true;
+      const rect = bubble.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      offsetX = clientX - rect.left;
+      offsetY = clientY - rect.top;
+      document.addEventListener('mousemove', onDrag);
+      document.addEventListener('mouseup', stopDrag);
+      document.addEventListener('touchmove', onDrag, { passive: false });
+      document.addEventListener('touchend', stopDrag);
+    }
+
+    function onDrag(e) {
+      if (!isDragging) return;
+      e.preventDefault();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const bubbleWidth = bubble.offsetWidth;
+      const bubbleHeight = bubble.offsetHeight;
+      const maxX = window.innerWidth - bubbleWidth;
+      const maxY = window.innerHeight - bubbleHeight;
+      let x = clientX - offsetX;
+      let y = clientY - offsetY;
+      x = Math.max(0, Math.min(x, maxX));
+      y = Math.max(0, Math.min(y, maxY));
+      bubble.style.left = ${x}px;
+      bubble.style.top = ${y}px;
+      bubble.style.transform = translate(0, 0);
+    }
+
+    function stopDrag() {
+      isDragging = false;
+      document.removeEventListener('mousemove', onDrag);
+      document.removeEventListener('mouseup', stopDrag);
+      document.removeEventListener('touchmove', onDrag);
+      document.removeEventListener('touchend', stopDrag);
+    }
+
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+      .then(stream => video.srcObject = stream);
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+      const words = text.split(' ');
+      let line = '';
+      for (let i = 0; i < words.length; i++) {
+        const testLine = line + words[i] + ' ';
+        const testWidth = ctx.measureText(testLine).width;
+        if (testWidth > maxWidth && i > 0) {
+          ctx.strokeText(line, x, y);
+          ctx.fillText(line, x, y);
+          line = words[i] + ' ';
+          y += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.strokeText(line, x, y);
+      ctx.fillText(line, x, y);
+    }
+
+    let lastCaptureBlob = null;
+
+    document.getElementById('capture').addEventListener('click', () => {
+      const canvas = document.createElement('canvas');
+      const width = video.videoWidth;
+      const height = video.videoHeight;
+      if (!width || !height) {
+        alert("카메라 준비 중입니다.");
+        return;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, width, height);
+
+      const bubbleRect = bubble.getBoundingClientRect();
+      const videoRect = video.getBoundingClientRect();
+      const scaleX = width / videoRect.width;
+      const scaleY = height / videoRect.height;
+      const x = (bubbleRect.left - videoRect.left) * scaleX;
+      const y = (bubbleRect.top - videoRect.top) * scaleY;
+      const bubbleW = bubbleRect.width * scaleX;
+      const bubbleH = bubbleRect.height * scaleY;
+
+      ctx.font = `${18 * scaleY}px sans-serif`;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      const text = (currentLang === 'en') ? quoteEn.textContent : quoteKo.textContent;
+      const neonColors = ["#00ff90", "#ffaa00", "#00ccff"];
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = neonColors[currentNeonIndex];
+      ctx.fillStyle = "white";
+
+      wrapText(ctx, text, x + bubbleW / 2, y + bubbleH / 2 - 10, bubbleW - 20, 24 * scaleY);
+
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        lastCaptureBlob = blob;
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'text-bubble-capture.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        document.getElementById('share').disabled = false;
+      }, 'image/png');
+    });
+
+    document.getElementById('share').addEventListener('click', async () => {
+      if (!lastCaptureBlob) return;
+
+      const filesArray = [new File([lastCaptureBlob], 'art-quote.png', { type: 'image/png' })];
+
+      const shareData = {
+        title: 'Art Quote',
+        text: 'Here’s an art quote I captured.',
+        files: filesArray
+      };
+
+      try {
+        if (navigator.canShare && navigator.canShare({ files: filesArray })) {
+          await navigator.share(shareData);
+          alert('공유 완료!');
+        } else {
+          alert('이 브라우저는 이미지 공유를 지원하지 않습니다.');
+        }
+      } catch (err) {
+        console.error('공유 실패:', err);
+      }
+
+      // 공유 완료 후 UI 초기화
+      resetUI();
+    });
+  </script>
 </body>
 </html>
