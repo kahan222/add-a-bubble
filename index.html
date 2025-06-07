@@ -489,6 +489,37 @@ function showShareButton() {
         console.error('공유 실패:', err);
       }
 
+  async function uploadCapturedImage(blob) {
+    const formData = new FormData();
+    formData.append('image', blob);
+
+    const imgbbApiKey = 'f9427d6d511849d1476fdc31971a3b93'; 
+    const imgbbEndpoint = `https://api.imgbb.com/1/upload?key=${imgbbApiKey}`;
+
+    try {
+      const response = await fetch(imgbbEndpoint, {
+        method: 'POST',
+        body: formData,
+      });
+      const result = await response.json();
+      const imageUrl = result.data.url;
+
+      // Firestore에 이미지 링크 저장
+      await addToFirestore(imageUrl);
+
+    } catch (error) {
+      console.error('이미지 업로드 실패:', error);
+      alert('⚠️ Bubble Storage 업로드에 실패했습니다.');
+    }
+  }
+
+  async function addToFirestore(imageUrl) {
+    const docRef = await firebase.firestore().collection('bubbles').add({
+      imageUrl: imageUrl,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+
       resetUI();
     });
   </script>
