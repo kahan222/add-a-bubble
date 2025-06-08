@@ -95,6 +95,9 @@
 <body>
   <video id="camera-view" autoplay playsinline muted></video>
 
+<img id="preview-img" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; object-fit:cover; z-index:9;" />
+<button id="manual-save-btn" style="display:none; position:fixed; bottom:100px; left:50%; transform:translateX(-50%); z-index:10; font-size:16px; padding:10px 20px; background:white; border:none; border-radius:10px; font-weight:bold;">📥 저장</button>
+  
   <div class="text-carousel">
     <div class="text-option" data-id="Han1"><div class="name-en">One Sentence</div><div class="name-ko">한 문장</div></div>
     <div class="text-option" data-id="Han2"><div class="name-en">Try</div><div class="name-ko">시도</div></div>
@@ -149,10 +152,10 @@ captureBtn.addEventListener('click', () => {
 
   canvas.toBlob(blob => {
     lastCaptureBlob = blob;
+    saveShareBtn.style.display = 'block';
     video.style.display = 'none';
     bubble.style.display = 'none';
     captureBtn.style.display = 'none';
-    saveShareBtn.style.display = 'block';
   }, 'image/png');
 });
       const url = URL.createObjectURL(blob);
@@ -282,11 +285,6 @@ document.getElementById('manual-save-btn').addEventListener('click', () => {
 
   alert("✅ 저장이 완료되었습니다.");
   location.reload(); // 초기화
-});
-    
-saveShareBtn.addEventListener('click', async () => {
-  if (!lastCaptureBlob) return;
-
 });
     
   </script>
