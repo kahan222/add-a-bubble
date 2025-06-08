@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Add a Bubble</title>
+  <title>Add a Bubble - Final Version</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
@@ -72,7 +72,7 @@
 
     .quote-en, .quote-ko { margin: 4px 0; }
 
-    #toggle-lang, #capture, #effect-toggle, #reset {
+    button {
       position: absolute;
       z-index: 10;
       background: white;
@@ -84,83 +84,37 @@
     }
 
     #toggle-lang { bottom: 120px; left: 20px; font-weight: bold; }
-    #capture {
-      bottom: 120px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 60px;
-      height: 60px;
-      font-size: 25px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: white;
-    }
-    #effect-toggle { bottom: 120px; right: 20px; }
-    #reset { top: 20px; right: 20px; }
+    #capture { bottom: 120px; left: 50%; transform: translateX(-50%); font-size: 25px; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
+    #effect { bottom: 120px; right: 20px; }
 
-    .bubble-style-neon-green {
-      text-shadow:
-        0 0 5px #00ff90,
-        0 0 10px #00ff90,
-        0 0 20px #00ff90,
-        0 0 40px #00ff90;
-    }
-    .bubble-style-neon-orange {
-      text-shadow:
-        0 0 5px #ffaa00,
-        0 0 10px #ffaa00,
-        0 0 20px #ffaa00,
-        0 0 40px #ffaa00;
-    }
-    .bubble-style-neon-blue {
-      text-shadow:
-        0 0 5px #00ccff,
-        0 0 10px #00ccff,
-        0 0 20px #00ccff,
-        0 0 40px #00ccff;
-    }
-    .bubble-style-green-black {
-      color: black;
-      text-shadow:
-        0 0 5px #00ff90,
-        0 0 10px #00ff90,
-        0 0 20px #00ff90,
-        0 0 40px #00ff90;
-    }
-    .bubble-style-orange-black {
-      color: black;
-      text-shadow:
-        0 0 5px #ffaa00,
-        0 0 10px #ffaa00,
-        0 0 20px #ffaa00,
-        0 0 40px #ffaa00;
-    }
-    .bubble-style-blue-black {
-      color: black;
-      text-shadow:
-        0 0 5px #00ccff,
-        0 0 10px #00ccff,
-        0 0 20px #00ccff,
-        0 0 40px #00ccff;
-    }
+    .neon-1 { color: white; text-shadow: 0 0 5px #00ff90, 0 0 10px #00ff90, 0 0 20px #00ff90; }
+    .neon-2 { color: white; text-shadow: 0 0 5px #ffaa00, 0 0 10px #ffaa00, 0 0 20px #ffaa00; }
+    .neon-3 { color: white; text-shadow: 0 0 5px #00ccff, 0 0 10px #00ccff, 0 0 20px #00ccff; }
+    .neon-4 { color: black; text-shadow: 0 0 5px #00ff90, 0 0 10px #00ff90, 0 0 20px #00ff90; }
+    .neon-5 { color: black; text-shadow: 0 0 5px #ffaa00, 0 0 10px #ffaa00, 0 0 20px #ffaa00; }
+    .neon-6 { color: black; text-shadow: 0 0 5px #00ccff, 0 0 10px #00ccff, 0 0 20px #00ccff; }
   </style>
 </head>
 <body>
   <video id="camera-view" autoplay playsinline muted></video>
+
   <div class="text-carousel">
-    <div class="text-option" data-id="Han1"><div class="name-en">Han1</div><div class="name-ko">한1</div></div>
-    <div class="text-option" data-id="Han2"><div class="name-en">Han2</div><div class="name-ko">한2</div></div>
+    <div class="text-option" data-id="Han1"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han2"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han3"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han4"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han5"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han6"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han7"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han8"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han9"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han10"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
   </div>
-  <div id="bubble-text">
-    <div class="quote-en"></div>
-    <div class="quote-ko"></div>
-  </div>
+
+  <div id="bubble-text"><div class="quote-en"></div><div class="quote-ko"></div></div>
   <button id="toggle-lang">KO / EN</button>
   <button id="capture">📸</button>
-  <button id="effect-toggle">Effect</button>
-  <button id="reset">↻ Reset</button>
+  <button id="effect">Effect</button>
 
   <script>
     const video = document.getElementById('camera-view');
@@ -169,21 +123,26 @@
     const quoteKo = document.querySelector('.quote-ko');
 
     const quotes = {
-      Han1: { en: "Art?", ko: "예술?" },
-      Han2: { en: "Try it!", ko: "해봐!" }
+      Han1: { en: "If it can be expressed in one sentence, is it really art?", ko: "한 문장으로 표현이 가능하다면, 그게 예술이 맞는가?" },
+      Han2: { en: "If you think you can do it too, maybe you should try.", ko: "나도 할 수 있을 것 같다면, 한 번 해보는 것도 좋을듯." },
+      Han3: { en: "How many people truly equate art with life?", ko: "예술과 삶을 동일시 하는 사람이 몇이나 되겠는가." },
+      Han4: { en: "If uniqueness defines art, that idea is already outdated.", ko: "유일함이 예술의 특성이란 말은, 옛 말일 뿐이다." },
+      Han5: { en: "Uncomfortable to see, impossible to forget.", ko: "불편해서 눈을 피했지만, 계속 생각나더라." },
+      Han6: { en: "The more technology evolves, the more extraordinary the artist becomes.", ko: "기술이 발전할수록 예술가는 더 대단해진다." },
+      Han7: { en: "Perfect order leaves no room for imagination.", ko: "완벽한 질서는 상상력을 허용하지 않는다." },
+      Han8: { en: "Without a viewer, it's incomplete.", ko: "보는 이가 없으면, 미완성이다." },
+      Han9: { en: "If all you want is to speak the truth, go to a news studio, not a gallery.", ko: "진실만을 말하려면, 미술관이 아니라 방송국으로 가라." },
+      Han10: { en: "Some works retrieve forgotten memories like a thief.", ko: "어떤 작품은 잊고 있었던 기억을 도둑처럼 찾아낸다." }
     };
 
     let currentLang = 'en';
-    let currentEffectIndex = 0;
+    let currentStyleIndex = 0;
+    const styles = ['neon-1','neon-2','neon-3','neon-4','neon-5','neon-6'];
 
-    const neonEffectClasses = [
-      'bubble-style-neon-green',
-      'bubble-style-neon-orange',
-      'bubble-style-neon-blue',
-      'bubble-style-green-black',
-      'bubble-style-orange-black',
-      'bubble-style-blue-black'
-    ];
+    function updateLangVisibility() {
+      quoteEn.style.display = (currentLang === 'en') ? 'block' : 'none';
+      quoteKo.style.display = (currentLang === 'ko') ? 'block' : 'none';
+    }
 
     function updateQuote(id, optionEl) {
       const quote = quotes[id];
@@ -195,15 +154,9 @@
       bubble.style.top = '50%';
       bubble.style.transform = 'translate(-50%, -50%)';
       updateLangVisibility();
+      bubble.className = ''; bubble.classList.add(styles[currentStyleIndex]);
       document.querySelectorAll('.text-option').forEach(el => el.classList.remove('selected'));
       optionEl.classList.add('selected');
-      bubble.classList.remove(...neonEffectClasses);
-      bubble.classList.add(neonEffectClasses[currentEffectIndex]);
-    }
-
-    function updateLangVisibility() {
-      quoteEn.style.display = (currentLang === 'en') ? 'block' : 'none';
-      quoteKo.style.display = (currentLang === 'ko') ? 'block' : 'none';
     }
 
     document.querySelectorAll('.text-option').forEach(option => {
@@ -215,27 +168,61 @@
       updateLangVisibility();
     });
 
-    document.getElementById('effect-toggle').addEventListener('click', () => {
-      bubble.classList.remove(...neonEffectClasses);
-      currentEffectIndex = (currentEffectIndex + 1) % neonEffectClasses.length;
-      bubble.classList.add(neonEffectClasses[currentEffectIndex]);
+    document.getElementById('effect').addEventListener('click', () => {
+      bubble.classList.remove(styles[currentStyleIndex]);
+      currentStyleIndex = (currentStyleIndex + 1) % styles.length;
+      bubble.classList.add(styles[currentStyleIndex]);
     });
 
-    document.getElementById('reset').addEventListener('click', () => {
-      bubble.style.display = 'none';
-      quoteEn.textContent = '';
-      quoteKo.textContent = '';
-      document.querySelectorAll('.text-option').forEach(el => el.classList.remove('selected'));
-      bubble.classList.remove(...neonEffectClasses);
-      currentEffectIndex = 0;
-      bubble.classList.add(neonEffectClasses[0]);
-    });
+    // 드래그
+    let isDragging = false, offsetX, offsetY;
+    bubble.addEventListener('mousedown', startDrag);
+    bubble.addEventListener('touchstart', startDrag, { passive: false });
+
+    function startDrag(e) {
+      isDragging = true;
+      const rect = bubble.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      offsetX = clientX - rect.left;
+      offsetY = clientY - rect.top;
+      document.addEventListener('mousemove', onDrag);
+      document.addEventListener('mouseup', stopDrag);
+      document.addEventListener('touchmove', onDrag, { passive: false });
+      document.addEventListener('touchend', stopDrag);
+    }
+
+    function onDrag(e) {
+      if (!isDragging) return;
+      e.preventDefault();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const bubbleWidth = bubble.offsetWidth;
+      const bubbleHeight = bubble.offsetHeight;
+      const maxX = window.innerWidth - bubbleWidth;
+      const maxY = window.innerHeight - bubbleHeight;
+      let x = clientX - offsetX;
+      let y = clientY - offsetY;
+      x = Math.max(0, Math.min(x, maxX));
+      y = Math.max(0, Math.min(y, maxY));
+      bubble.style.left = `${x}px`;
+      bubble.style.top = `${y}px`;
+      bubble.style.transform = 'translate(0, 0)';
+    }
+
+    function stopDrag() {
+      isDragging = false;
+      document.removeEventListener('mousemove', onDrag);
+      document.removeEventListener('mouseup', stopDrag);
+      document.removeEventListener('touchmove', onDrag);
+      document.removeEventListener('touchend', stopDrag);
+    }
 
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
       .then(stream => video.srcObject = stream)
       .catch(err => {
         console.error("카메라 접근 실패:", err);
-        alert("카메라 권한이 필요합니다.");
+        alert("카메라 접근 권한을 허용해주세요.");
       });
   </script>
 </body>
