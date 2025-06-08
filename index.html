@@ -93,13 +93,16 @@
     const body = document.body;
 
     // 카메라 실행
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-      .then(stream => {
-        video.srcObject = stream;
-      })
-      .catch(err => {
-        alert("카메라에 접근할 수 없습니다: " + err);
-      });
+navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+  .then(stream => {
+    video.srcObject = stream;
+    video.onloadedmetadata = () => {
+      video.play();
+    };
+  })
+  .catch(err => {
+    alert("카메라에 접근할 수 없습니다: " + err);
+  });
 
     // 스티커 생성
     stickerBar.querySelectorAll('.sticker-option').forEach(option => {
