@@ -137,33 +137,44 @@ navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
       });
     });
 
-    // 캡처 버튼
-    captureBtn.addEventListener('click', () => {
-      const width = video.videoWidth;
-      const height = video.videoHeight;
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, width, height);
+   // 캡처 버튼
+captureBtn.addEventListener('click', () => {
+  if (video.readyState < 2) { // HAVE_CURRENT_DATA 이하라면 준비되지 않음
+    alert("카메라가 아직 준비되지 않았습니다.");
+    return;
+  }
 
-      // 스티커 캡처
-      document.querySelectorAll('.sticker').forEach(sticker => {
-        const rect = sticker.getBoundingClientRect();
-        const x = rect.left;
-        const y = rect.top;
-        ctx.font = '24px sans-serif';
-        ctx.fillStyle = 'white';
-        ctx.fillRect(x, y, rect.width, rect.height);
-        ctx.fillStyle = 'black';
-        ctx.fillText(sticker.textContent, x + 10, y + 30);
-      });
+  const width = video.videoWidth;
+  const height = video.videoHeight;
 
-      // 저장
-      const link = document.createElement('a');
-      link.download = 'bubble-capture.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    });
+  if (width === 0 || height === 0) {
+    alert("영상이 아직 로드되지 않았습니다.");
+    return;
+  }
+
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, width, height);
+
+  // 스티커 캡처
+  document.querySelectorAll('.sticker').forEach(sticker => {
+    const rect = sticker.getBoundingClientRect();
+    const x = rect.left;
+    const y = rect.top;
+    ctx.font = '24px sans-serif';
+    ctx.fillStyle = 'white';
+    ctx.fillRect(x, y, rect.width, rect.height);
+    ctx.fillStyle = 'black';
+    ctx.fillText(sticker.textContent, x + 10, y + 30);
+  });
+
+  // 저장
+  const link = document.createElement('a');
+  link.download = 'bubble-capture.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});
   </script>
 </body>
 </html>
