@@ -93,16 +93,16 @@
     const body = document.body;
 
     // 카메라 실행
-navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-  .then(stream => {
-    video.srcObject = stream;
-    video.onloadedmetadata = () => {
-      video.play();
-    };
-  })
-  .catch(err => {
-    alert("카메라에 접근할 수 없습니다: " + err);
-  });
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "environment" } }, audio: false })
+      .then(stream => {
+        video.srcObject = stream;
+        video.onloadedmetadata = () => {
+          video.play();
+        };
+      })
+      .catch(err => {
+        alert("카메라에 접근할 수 없습니다: " + err.message);
+      });
 
     // 스티커 생성
     stickerBar.querySelectorAll('.sticker-option').forEach(option => {
@@ -137,44 +137,42 @@ navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
       });
     });
 
-   // 캡처 버튼
-captureBtn.addEventListener('click', () => {
-  if (video.readyState < 2) { // HAVE_CURRENT_DATA 이하라면 준비되지 않음
-    alert("카메라가 아직 준비되지 않았습니다.");
-    return;
-  }
+    // 캡처 버튼
+    captureBtn.addEventListener('click', () => {
+      const width = video.videoWidth;
+      const height = video.videoHeight;
 
-  const width = video.videoWidth;
-  const height = video.videoHeight;
+      if (width === 0 || height === 0) {
+        alert("카메라 영상이 아직 준비되지 않았습니다.");
+        return;
+      }
 
-  if (width === 0 || height === 0) {
-    alert("영상이 아직 로드되지 않았습니다.");
-    return;
-  }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
 
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0, width, height);
+      // 실제 비디오 비율과 맞게 조정
+      ctx.drawImage(video, 0, 0, width, height);
 
-  // 스티커 캡처
-  document.querySelectorAll('.sticker').forEach(sticker => {
-    const rect = sticker.getBoundingClientRect();
-    const x = rect.left;
-    const y = rect.top;
-    ctx.font = '24px sans-serif';
-    ctx.fillStyle = 'white';
-    ctx.fillRect(x, y, rect.width, rect.height);
-    ctx.fillStyle = 'black';
-    ctx.fillText(sticker.textContent, x + 10, y + 30);
-  });
+      // 모든 스티커 그리기
+      document.querySelectorAll('.sticker').forEach(sticker => {
+        const rect = sticker.getBoundingClientRect();
+        const scaleX = width / window.innerWidth;
+        const scaleY = height / window.innerHeight;
 
-  // 저장
-  const link = document.createElement('a');
-  link.download = 'bubble-capture.png';
-  link.href = canvas.toDataURL('image/png');
-  link.click();
-});
+        ctx.font = '24px sans-serif';
+        ctx.fillStyle = 'white';
+        ctx.fillRect(rect.left * scaleX, rect.top * scaleY, rect.width * scaleX, rect.height * scaleY);
+        ctx.fillStyle = 'black';
+        ctx.fillText(sticker.textContent, rect.left * scaleX + 10, rect.top * scaleY + 30);
+      });
+
+      // 저장
+      const link = document.createElement('a');
+      link.download = 'bubble-capture.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
   </script>
 </body>
 </html>
