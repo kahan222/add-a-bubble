@@ -33,18 +33,17 @@
     }
 .text-sticker {
   position: absolute;
-  font-size: 16px;
-  background: white;
-  color: black;
-  padding: 4px 10px;
-  border-radius: 12px;
-  cursor: move;
+  font-size: 20px;
+  color: white;
+  background: none;
+  border: none;
+  text-align: center;
   white-space: pre-line;
-  text-align: center;           
-  display: flex;                
-  flex-direction: column;        
-  justify-content: center;        
-  align-items: center;        
+  text-shadow:
+    0 0 5px #ffa500,
+    0 0 10px #ffa500,
+    0 0 20px #ffa500,
+    0 0 40px #ffa500;
 }
     .sticker-bar, .text-carousel {
       position: absolute;
@@ -262,26 +261,26 @@ document.querySelectorAll('.text-option').forEach(option => {
   });
 });
 
-        const colorThemes = [
-        { bg: 'white', color: 'black' },
-        { bg: 'black', color: 'white' },
-        { bg: 'skyblue', color: 'black' },
-        { bg: 'deeppink', color: 'white' }
-       ];
+        const neonColors = ['#ffa500', '#00ffff', '#ff00ff', '#00ff00'];
+        let currentNeonIndex = 0;
 
         let currentColorIndex = 0;
         const colorBtn = document.getElementById('color-toggle');
 
         colorBtn.addEventListener('click', () => {
-        currentColorIndex = (currentColorIndex + 1) % colorThemes.length;
-        const theme = colorThemes[currentColorIndex];
+        currentNeonIndex = (currentNeonIndex + 1) % neonColors.length;
+        const glow = neonColors[currentNeonIndex];
 
-        // 현재 떠있는 스티커에 적용
-        document.querySelectorAll('.sticker, .text-sticker').forEach(el => {
-        el.style.background = theme.bg;
-        el.style.color = theme.color;
-     });
-    });
+        document.querySelectorAll('.text-sticker').forEach(el => {
+        el.style.color = 'white';
+        el.style.textShadow = `
+        0 0 5px ${glow},
+        0 0 10px ${glow},
+        0 0 20px ${glow},
+        0 0 40px ${glow}
+    `;
+  });
+});
        
     function makeDraggable(div) {
       let offsetX, offsetY, isDragging = false;
