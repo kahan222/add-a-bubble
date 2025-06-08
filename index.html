@@ -150,27 +150,19 @@ captureBtn.addEventListener('click', () => {
   ctx.shadowBlur = 10;
   ctx.fillText(bubble.textContent.trim(), x, y);
 
-  canvas.toBlob(blob => {
-    if (!blob) {
-      alert("❌ 이미지 캡처 실패");
-      return;
-    }
+canvas.toBlob(blob => {
+  if (!blob) return;
+  lastCaptureBlob = blob;
 
-      lastCaptureBlob = blob;
+  const url = URL.createObjectURL(blob);
+  document.getElementById('preview-img').src = url;
+  document.getElementById('preview-img').style.display = 'block';
+  document.getElementById('manual-save-btn').style.display = 'block';
 
-    // ✅ 이미지 미리보기 보여주기
-    const url = URL.createObjectURL(blob);
-    document.getElementById('preview-img').src = url;
-    document.getElementById('preview-img').style.display = 'block';
-
-    // ✅ 저장 버튼 보이기
-    document.getElementById('manual-save-btn').style.display = 'block';
-
-    // ❌ 비디오/버튼 숨기기
-    video.style.display = 'none';
-    bubble.style.display = 'none';
-    captureBtn.style.display = 'none';
-  }, 'image/png');
+  video.style.display = 'none';
+  bubble.style.display = 'none';
+  captureBtn.style.display = 'none';
+}, 'image/png');
 });
    
     const quotes = {
@@ -277,19 +269,13 @@ captureBtn.addEventListener('click', () => {
       });
     
 document.getElementById('manual-save-btn').addEventListener('click', () => {
-  if (!lastCaptureBlob) return;
+  if (!lastCaptureBlob) {
+    alert("⚠️ 이미지가 준비되지 않았습니다.");
+    return;
+  }
 
   const url = URL.createObjectURL(lastCaptureBlob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'bubble.png';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-
-  alert("✅ 저장이 완료되었습니다.");
-  location.reload(); // 초기화
+  window.open(url, '_blank'); // 새 탭에서 이미지 열기 → 저장/공유 유도
 });
     
   </script>
