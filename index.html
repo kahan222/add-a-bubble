@@ -217,29 +217,45 @@ langBtn.addEventListener('click', () => {
   }
 });
     
-    let currentTextSticker = null;
-    document.querySelectorAll('.text-option').forEach(option => {
-    option.addEventListener('click', () => {
+let currentTextSticker = null;
+let lastPosition = { left: '30px', top: '30px' };
+
+document.querySelectorAll('.text-option').forEach(option => {
+  option.addEventListener('click', () => {
+    // 선택 표시
     document.querySelectorAll('.text-option').forEach(opt => opt.classList.remove('selected'));
     option.classList.add('selected');
-        const id = option.dataset.id;
-        const quote = quotes[id];
-        if (!quote) return;
-        if (currentTextSticker) currentTextSticker.remove();
-        const div = document.createElement('div');
-        div.className = 'text-sticker';
-        div.textContent = quote[lang]; 
-        div.dataset.id = id;  
-        div.style.left = '30px';
-        div.style.top = '30px';
-        makeDraggable(div);
-        const theme = colorThemes[currentColorIndex];
-        div.style.background = theme.bg;
-        div.style.color = theme.color;
-        body.appendChild(div);
-        currentTextSticker = div;
-      });
-    });
+
+    // 기존 스티커 제거 및 위치 저장
+    if (currentTextSticker) {
+      lastPosition = {
+        left: currentTextSticker.style.left,
+        top: currentTextSticker.style.top
+      };
+      currentTextSticker.remove();
+    }
+
+    const id = option.dataset.id;
+    const quote = quotes[id];
+    if (!quote) return;
+
+    const div = document.createElement('div');
+    div.className = 'text-sticker';
+    div.textContent = quote[lang];
+    div.dataset.id = id;
+    div.style.left = lastPosition.left;
+    div.style.top = lastPosition.top;
+
+    makeDraggable(div);
+
+    const theme = colorThemes[currentColorIndex];
+    div.style.background = theme.bg;
+    div.style.color = theme.color;
+
+    body.appendChild(div);
+    currentTextSticker = div;
+  });
+});
 
         const colorThemes = [
         { bg: 'white', color: 'black' },
