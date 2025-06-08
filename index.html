@@ -112,13 +112,46 @@
   <button id="toggle-lang">KO / EN</button>
   <button id="capture">📸</button>
   <button id="effect">Effect</button>
+  <button id="save-share-btn" style="display:none; position:absolute; bottom: 200px; left: 50%; transform: translateX(-50%); z-index:10; background:white; border:none; border-radius:10px; padding:10px 16px; font-size:14px; font-weight:bold; cursor:pointer;"></button>
+
 
   <script>
     const video = document.getElementById('camera-view');
     const bubble = document.getElementById('bubble-text');
     const quoteEn = document.querySelector('.quote-en');
     const quoteKo = document.querySelector('.quote-ko');
+    const captureBtn = document.getElementById('capture');
+captureBtn.addEventListener('click', () => {
+  const canvas = document.createElement('canvas');
+  const width = video.videoWidth;
+  const height = video.videoHeight;
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, width, height);
 
+  const bubbleRect = bubble.getBoundingClientRect();
+  const scaleX = width / window.innerWidth;
+  const scaleY = height / window.innerHeight;
+  const x = bubbleRect.left * scaleX + bubbleRect.width * scaleX / 2;
+  const y = bubbleRect.top * scaleY + bubbleRect.height * scaleY / 2;
+
+  ctx.font = "bold 30px sans-serif";
+  ctx.fillStyle = "white";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.shadowColor = "#00ff90";
+  ctx.shadowBlur = 10;
+  ctx.fillText(bubble.textContent.trim(), x, y);
+
+  canvas.toBlob(blob => {
+    lastCaptureBlob = blob;
+    video.style.display = 'none';
+    bubble.style.display = 'none';
+    captureBtn.style.display = 'none';
+    saveShareBtn.style.display = 'block';
+  }, 'image/png');
+});
     const quotes = {
       Han1: { en: "If it can be expressed in one sentence, is it really art?", ko: "한 문장으로 표현이 가능하다면, 그게 예술이 맞는가?" },
       Han2: { en: "If you think you can do it too, maybe you should try.", ko: "나도 할 수 있을 것 같다면, 한 번 해보는 것도 좋을듯." },
@@ -221,6 +254,26 @@
         console.error("카메라 접근 실패:", err);
         alert("카메라 접근 권한을 허용해주세요.");
       });
+saveShareBtn.addEventListener('click', async () => {
+  if (!lastCaptureBlob) return;
+
+  // 다운로드 저장
+  const url = URL.createObjectURL(lastCaptureBlob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = 'bubble.png';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+
+  // 업로드 (선택적으로 imgbb + firestore 연동 가능)
+  // await uploadCapturedImage(lastCaptureBlob);
+
+  alert("✅ 저장 및 공유가 완료되었습니다.");
+  location.reload(); // 초기화
+});
+    
   </script>
 </body>
 </html>
