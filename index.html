@@ -166,10 +166,21 @@ function startDrag(e) {
 
 function onDrag(e) {
   if (!isDragging) return;
+
   const clientX = e.touches ? e.touches[0].clientX : e.clientX;
   const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  const x = clientX - offsetX;
-  const y = clientY - offsetY;
+  const bubbleWidth = bubble.offsetWidth;
+  const bubbleHeight = bubble.offsetHeight;
+  const maxX = window.innerWidth - bubbleWidth;
+  const maxY = window.innerHeight - bubbleHeight;
+
+  let x = clientX - offsetX;
+  let y = clientY - offsetY;
+
+  // ❗ 스티커가 화면 밖으로 나가지 않도록 제한
+  x = Math.max(0, Math.min(x, maxX));
+  y = Math.max(0, Math.min(y, maxY));
+
   bubble.style.left = `${x}px`;
   bubble.style.top = `${y}px`;
   bubble.style.transform = "translate(0, 0)";
