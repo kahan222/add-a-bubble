@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Add a Bubble - Final Version</title>
+  <title>Text Bubble Capture</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body {
@@ -72,7 +72,7 @@
 
     .quote-en, .quote-ko { margin: 4px 0; }
 
-    button {
+    #toggle-lang, #capture, #share, #style-toggle, #reset {
       position: absolute;
       z-index: 10;
       background: white;
@@ -84,118 +84,134 @@
     }
 
     #toggle-lang { bottom: 120px; left: 20px; font-weight: bold; }
-    #capture { bottom: 120px; left: 50%; transform: translateX(-50%); font-size: 25px; border-radius: 50%; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; }
-    #effect { bottom: 120px; right: 20px; }
 
-    .neon-1 { color: white; text-shadow: 0 0 5px #00ff90, 0 0 10px #00ff90, 0 0 20px #00ff90; }
-    .neon-2 { color: white; text-shadow: 0 0 5px #ffaa00, 0 0 10px #ffaa00, 0 0 20px #ffaa00; }
-    .neon-3 { color: white; text-shadow: 0 0 5px #00ccff, 0 0 10px #00ccff, 0 0 20px #00ccff; }
+    #capture {
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 60px;
+      font-size: 25px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #style-toggle { bottom: 120px; right: 20px; }
+
+    #share { bottom: 200px; left: 20px; }
+
+    #reset { top: 20px; right: 20px; }
+
+    #share:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .bubble-style-neon-green {
+      text-shadow:
+        0 0 5px #00ff90,
+        0 0 10px #00ff90,
+        0 0 20px #00ff90,
+        0 0 40px #00ff90;
+    }
+
+    .bubble-style-neon-orange {
+      text-shadow:
+        0 0 5px #ffaa00,
+        0 0 10px #ffaa00,
+        0 0 20px #ffaa00,
+        0 0 40px #ffaa00;
+    }
+
+    .bubble-style-neon-blue {
+      text-shadow:
+        0 0 5px #00ccff,
+        0 0 10px #00ccff,
+        0 0 20px #00ccff,
+        0 0 40px #00ccff;
+    }
   </style>
 </head>
 <body>
-  <video id="camera-view" autoplay playsinline muted></video>
 
-<a id="manual-save-btn"
-   style="display:none; position:fixed; bottom:100px; left:50%; transform:translateX(-50%); z-index:10; font-size:16px; padding:10px 20px; background:white; border-radius:10px; font-weight:bold; text-decoration:none; color:black;">
-  📥 이미지 저장
-</a>
-  
+    <video id="camera-view" autoplay playsinline muted></video>
+
   <div class="text-carousel">
-    <div class="text-option" data-id="Han1"><div class="name-en">One Sentence</div><div class="name-ko">한 문장</div></div>
-    <div class="text-option" data-id="Han2"><div class="name-en">Try</div><div class="name-ko">시도</div></div>
-    <div class="text-option" data-id="Han3"><div class="name-en">Life</div><div class="name-ko">삶</div></div>
-    <div class="text-option" data-id="Han4"><div class="name-en">Uniqueness</div><div class="name-ko">유일함</div></div>
-    <div class="text-option" data-id="Han5"><div class="name-en">Uncomfortable</div><div class="name-ko">불편함</div></div>
-    <div class="text-option" data-id="Han6"><div class="name-en">Technology</div><div class="name-ko">기술</div></div>
-    <div class="text-option" data-id="Han7"><div class="name-en">Imagination</div><div class="name-ko">상상력</div></div>
-    <div class="text-option" data-id="Han8"><div class="name-en">Incomplete</div><div class="name-ko">미완성</div></div>
-    <div class="text-option" data-id="Han9"><div class="name-en">Truth</div><div class="name-ko">진실</div></div>
-    <div class="text-option" data-id="Han10"><div class="name-en">Thief</div><div class="name-ko">도둑</div></div>
+    <div class="text-option" data-id="Han1"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han2"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han3"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han4"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han5"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han6"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han7"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han8"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han9"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
+    <div class="text-option" data-id="Han10"><div class="name-en">Han Hwangsu</div><div class="name-ko">한황수</div></div>
   </div>
 
-  <div id="bubble-text"><div class="quote-en"></div><div class="quote-ko"></div></div>
+  <div id="bubble-text">
+    <div class="quote-en"></div>
+    <div class="quote-ko"></div>
+  </div>
+
   <button id="toggle-lang">KO / EN</button>
   <button id="capture">📸</button>
-  <button id="effect">Effect</button>
-  <button id="save-share-btn" style="display:none; position:absolute; bottom: 200px; left: 50%; transform: translateX(-50%); z-index:10; background:white; border:none; border-radius:10px; padding:10px 16px; font-size:14px; font-weight:bold; cursor:pointer;"></button>
+  <button id="style-toggle">Style</button>
+  <button id="share" disabled>Share</button>
+  <button id="reset">↻ Reset</button>
 
   <script>
     const video = document.getElementById('camera-view');
     const bubble = document.getElementById('bubble-text');
     const quoteEn = document.querySelector('.quote-en');
     const quoteKo = document.querySelector('.quote-ko');
-    const captureBtn = document.getElementById('capture');
-    const saveShareBtn = document.getElementById('save-share-btn');
-    const manualSaveBtn = document.getElementById('manual-save-btn');
 
-     let lastCaptureBlob = null;
-
-captureBtn.addEventListener('click', () => {
-  const canvas = document.createElement('canvas');
-  const width = video.videoWidth;
-  const height = video.videoHeight;
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0, width, height);
-
-  // 현재 언어에 따라 텍스트 선택
-  const text = (currentLang === 'en') ? quoteEn.textContent : quoteKo.textContent;
-  const bubbleRect = bubble.getBoundingClientRect();
-  const scaleX = width / window.innerWidth;
-  const scaleY = height / window.innerHeight;
-  const x = bubbleRect.left * scaleX + bubbleRect.width * scaleX / 2;
-  const y = bubbleRect.top * scaleY + bubbleRect.height * scaleY / 2;
-
-  ctx.font = "bold 30px sans-serif";
-  ctx.fillStyle = "white";
-  ctx.textAlign = "center";
-  ctx.textBaseline = "middle";
-  ctx.shadowColor = "#00ff90";
-  ctx.shadowBlur = 10;
-  ctx.fillText(text.trim(), x, y);
-
-// 캡처가 끝나면 버튼을 <a>로 바꾸는 방식
-canvas.toBlob(blob => {
-  if (!blob) {
-    alert("❌ 이미지 생성 실패");
-    return;
-  }
-
-  lastCaptureBlob = blob;
-  const url = URL.createObjectURL(blob);
-
-  manualSaveBtn.textContent = "📥 이미지 저장";
-  manualSaveBtn.setAttribute('href', url);
-  manualSaveBtn.setAttribute('download', 'bubble.png');
-  manualSaveBtn.style.display = 'block';
-
-  // iOS 대응을 위해 'a.click()'은 사용하지 않음
-  alert("✅ 캡처 완료! 아래 버튼을 직접 눌러 저장하세요.");
-}, 'image/png');
-});
-   
     const quotes = {
-      Han1: { en: "If it can be expressed in one sentence, is it really art?", ko: "한 문장으로 표현이 가능하다면, 그게 예술이 맞는가?" },
-      Han2: { en: "If you think you can do it too, maybe you should try.", ko: "나도 할 수 있을 것 같다면, 한 번 해보는 것도 좋을듯." },
-      Han3: { en: "How many people truly equate art with life?", ko: "예술과 삶을 동일시 하는 사람이 몇이나 되겠는가." },
-      Han4: { en: "If uniqueness defines art, that idea is already outdated.", ko: "유일함이 예술의 특성이란 말은, 옛 말일 뿐이다." },
-      Han5: { en: "Uncomfortable to see, impossible to forget.", ko: "불편해서 눈을 피했지만, 계속 생각나더라." },
-      Han6: { en: "The more technology evolves, the more extraordinary the artist becomes.", ko: "기술이 발전할수록 예술가는 더 대단해진다." },
-      Han7: { en: "Perfect order leaves no room for imagination.", ko: "완벽한 질서는 상상력을 허용하지 않는다." },
-      Han8: { en: "Without a viewer, it's incomplete.", ko: "보는 이가 없으면, 미완성이다." },
-      Han9: { en: "If all you want is to speak the truth, go to a news studio, not a gallery.", ko: "진실만을 말하려면, 미술관이 아니라 방송국으로 가라." },
-      Han10: { en: "Some works retrieve forgotten memories like a thief.", ko: "어떤 작품은 잊고 있었던 기억을 도둑처럼 찾아낸다." }
+      Han1: {
+        en: "If it can be expressed in one sentence, is it really art?",
+        ko: "한 문장으로 표현이 가능하다면, 그게 예술이 맞는가?"
+      },
+      Han2: {
+        en: "If you think you can do it too, maybe you should try.",
+        ko: "나도 할 수 있을 것 같다면, 한 번 해보는 것도 좋을듯."
+      },
+      Han3: {
+        en: "How many people truly equate art with life?",
+        ko: "예술과 삶을 동일시 하는 사람이 몇이나 되겠는가."
+      },
+      Han4: {
+        en: "If uniqueness defines art, that idea is already outdated.",
+        ko: "유일함이 예술의 특성이라면, 옛 말일 뿐이다."
+      },
+      Han5: {
+        en: "It made me look away—then look again.",
+        ko: "불편해서 눈을 돌렸다가 다시 쳐다보게 되었다."
+      },
+      Han6: {
+        en: "The more technology evolves, the more extraordinary the artist becomes.",
+        ko: "기술이 발전할수록 예술가는 대단해진다."
+      },
+      Han7: {
+        en: "The more orderly the work, the narrower the viewer’s thoughts.",
+        ko: "질서가 정연할수록 관객은 한 방향만 생각한다."
+      },
+      Han8: {
+        en: "Without someone to see it, is it still complete?",
+        ko: "보는 사람이 없으면, 미완성이 아닐까."
+      },
+      Han9: {
+        en: "If all you want is to speak the truth, go to a news studio, not a gallery.",
+        ko: "진실만을 말하려면, 미술관이 아니라 방송국으로 가라."
+      },
+      Han10: {
+        en: "Some works steal back memories you thought you had forgotten.",
+        ko: "어떤 작품은 잊고 있었던 기억을 도둑처럼 찾아낸다."
+      }
     };
 
     let currentLang = 'en';
-    let currentStyleIndex = 0;
-    const styles = ['neon-1','neon-2','neon-3'];
-
-    function updateLangVisibility() {
-      quoteEn.style.display = (currentLang === 'en') ? 'block' : 'none';
-      quoteKo.style.display = (currentLang === 'ko') ? 'block' : 'none';
-    }
 
     function updateQuote(id, optionEl) {
       const quote = quotes[id];
@@ -207,9 +223,13 @@ canvas.toBlob(blob => {
       bubble.style.top = '50%';
       bubble.style.transform = 'translate(-50%, -50%)';
       updateLangVisibility();
-      bubble.className = ''; bubble.classList.add(styles[currentStyleIndex]);
       document.querySelectorAll('.text-option').forEach(el => el.classList.remove('selected'));
       optionEl.classList.add('selected');
+    }
+
+    function updateLangVisibility() {
+      quoteEn.style.display = (currentLang === 'en') ? 'block' : 'none';
+      quoteKo.style.display = (currentLang === 'ko') ? 'block' : 'none';
     }
 
     document.querySelectorAll('.text-option').forEach(option => {
@@ -221,13 +241,37 @@ canvas.toBlob(blob => {
       updateLangVisibility();
     });
 
-    document.getElementById('effect').addEventListener('click', () => {
-      bubble.classList.remove(styles[currentStyleIndex]);
-      currentStyleIndex = (currentStyleIndex + 1) % styles.length;
-      bubble.classList.add(styles[currentStyleIndex]);
+    const neonClasses = [
+      'bubble-style-neon-green',
+      'bubble-style-neon-orange',
+      'bubble-style-neon-blue'
+    ];
+    let currentNeonIndex = 0;
+    bubble.classList.add(neonClasses[0]);
+
+    document.getElementById('style-toggle').addEventListener('click', () => {
+      bubble.classList.remove(neonClasses[currentNeonIndex]);
+      currentNeonIndex = (currentNeonIndex + 1) % neonClasses.length;
+      bubble.classList.add(neonClasses[currentNeonIndex]);
     });
 
-    // 드래그
+    document.getElementById('reset').addEventListener('click', resetUI);
+
+    function resetUI() {
+      bubble.style.display = 'none';
+      document.querySelectorAll('.text-option').forEach(el => el.classList.remove('selected'));
+      document.getElementById('share').disabled = true;
+
+      // Reset neon
+      bubble.classList.remove(...neonClasses);
+      currentNeonIndex = 0;
+      bubble.classList.add(neonClasses[0]);
+
+      quoteEn.textContent = '';
+      quoteKo.textContent = '';
+    }
+
+    // 드래그 기능
     let isDragging = false, offsetX, offsetY;
     bubble.addEventListener('mousedown', startDrag);
     bubble.addEventListener('touchstart', startDrag, { passive: false });
@@ -258,9 +302,9 @@ canvas.toBlob(blob => {
       let y = clientY - offsetY;
       x = Math.max(0, Math.min(x, maxX));
       y = Math.max(0, Math.min(y, maxY));
-      bubble.style.left = `${x}px`;
-      bubble.style.top = `${y}px`;
-      bubble.style.transform = 'translate(0, 0)';
+      bubble.style.left = ${x}px;
+      bubble.style.top = ${y}px;
+      bubble.style.transform = translate(0, 0);
     }
 
     function stopDrag() {
@@ -272,37 +316,106 @@ canvas.toBlob(blob => {
     }
 
     navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-      .then(stream => video.srcObject = stream)
-      .catch(err => {
-        console.error("카메라 접근 실패:", err);
-        alert("카메라 접근 권한을 허용해주세요.");
-      });
-    
-manualSaveBtn.addEventListener('click', () => {
-  if (!lastCaptureBlob) {
-    alert("⚠️ 이미지가 준비되지 않았습니다.");
-    return;
-  }
+      .then(stream => video.srcObject = stream);
 
-  const url = URL.createObjectURL(lastCaptureBlob);
-  
-  // 버튼을 바로 <a> 역할로 바꿔버리기
-  manualSaveBtn.textContent = "🖼 이미지 저장 중...";
-  manualSaveBtn.style.pointerEvents = 'none'; // 다시 못 누르게
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+      const words = text.split(' ');
+      let line = '';
+      for (let i = 0; i < words.length; i++) {
+        const testLine = line + words[i] + ' ';
+        const testWidth = ctx.measureText(testLine).width;
+        if (testWidth > maxWidth && i > 0) {
+          ctx.strokeText(line, x, y);
+          ctx.fillText(line, x, y);
+          line = words[i] + ' ';
+          y += lineHeight;
+        } else {
+          line = testLine;
+        }
+      }
+      ctx.strokeText(line, x, y);
+      ctx.fillText(line, x, y);
+    }
 
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'bubble.png';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
+    let lastCaptureBlob = null;
 
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-    manualSaveBtn.style.display = 'none'; // 버튼 숨김
-  }, 1000);
-});
-    
+    document.getElementById('capture').addEventListener('click', () => {
+      const canvas = document.createElement('canvas');
+      const width = video.videoWidth;
+      const height = video.videoHeight;
+      if (!width || !height) {
+        alert("카메라 준비 중입니다.");
+        return;
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, width, height);
+
+      const bubbleRect = bubble.getBoundingClientRect();
+      const videoRect = video.getBoundingClientRect();
+      const scaleX = width / videoRect.width;
+      const scaleY = height / videoRect.height;
+      const x = (bubbleRect.left - videoRect.left) * scaleX;
+      const y = (bubbleRect.top - videoRect.top) * scaleY;
+      const bubbleW = bubbleRect.width * scaleX;
+      const bubbleH = bubbleRect.height * scaleY;
+
+      ctx.font = ${18 * scaleY}px sans-serif;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+
+      const text = (currentLang === 'en') ? quoteEn.textContent : quoteKo.textContent;
+      const neonColors = ["#00ff90", "#ffaa00", "#00ccff"];
+      ctx.lineWidth = 4;
+      ctx.strokeStyle = neonColors[currentNeonIndex];
+      ctx.fillStyle = "white";
+
+      wrapText(ctx, text, x + bubbleW / 2, y + bubbleH / 2 - 10, bubbleW - 20, 24 * scaleY);
+
+      canvas.toBlob((blob) => {
+        if (!blob) return;
+        lastCaptureBlob = blob;
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'text-bubble-capture.png';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        document.getElementById('share').disabled = false;
+      }, 'image/png');
+    });
+
+    document.getElementById('share').addEventListener('click', async () => {
+      if (!lastCaptureBlob) return;
+
+      const filesArray = [new File([lastCaptureBlob], 'art-quote.png', { type: 'image/png' })];
+
+      const shareData = {
+        title: 'Art Quote',
+        text: 'Here’s an art quote I captured.',
+        files: filesArray
+      };
+
+      try {
+        if (navigator.canShare && navigator.canShare({ files: filesArray })) {
+          await navigator.share(shareData);
+          alert('공유 완료!');
+        } else {
+          alert('이 브라우저는 이미지 공유를 지원하지 않습니다.');
+        }
+      } catch (err) {
+        console.error('공유 실패:', err);
+      }
+
+      // 공유 완료 후 UI 초기화
+      resetUI();
+    });
   </script>
 </body>
 </html>
