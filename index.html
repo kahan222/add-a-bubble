@@ -81,6 +81,20 @@
 <body>
   <video id="camera-view" autoplay playsinline muted></video>
 
+  <button id="lang-toggle" style="
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 12;
+    background: white;
+    color: black;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+  ">KO</button>
+  
   <div class="text-carousel" id="text-carousel">
     <div class="text-option" data-id="Han1"><div class="name-en">One Sentence</div><div class="name-ko">한 문장</div></div>
     <div class="text-option" data-id="Han2"><div class="name-en">Try</div><div class="name-ko">시도</div></div>
@@ -127,6 +141,21 @@
       Han10: { en: "Some works retrieve forgotten memories like a thief.", ko: "어떤 작품은 잊고 있었던 기억을 도둑처럼 찾아낸다." }
     };
 
+let lang = 'en'; // ✅ 초기값은 영어
+const langBtn = document.getElementById('lang-toggle');
+
+langBtn.addEventListener('click', () => {
+  lang = (lang === 'en') ? 'ko' : 'en';
+  langBtn.textContent = (lang === 'en') ? 'KO' : 'EN';
+
+  // 기존 스티커 텍스트도 업데이트
+  if (currentTextSticker && currentTextSticker.dataset.id) {
+    const id = currentTextSticker.dataset.id;
+    const quote = quotes[id];
+    currentTextSticker.textContent = quote[lang];
+  }
+});
+    
     let currentTextSticker = null;
     document.querySelectorAll('.text-option').forEach(option => {
       option.addEventListener('click', () => {
@@ -137,6 +166,7 @@
         const div = document.createElement('div');
         div.className = 'text-sticker';
         div.textContent = quote.en + "\n" + quote.ko;
+        div.dataset.id = id;
         div.style.left = '30px';
         div.style.top = '30px';
         makeDraggable(div);
