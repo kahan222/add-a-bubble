@@ -161,18 +161,48 @@
       .catch(err => alert("카메라에 접근할 수 없습니다: " + err.message));
 
     // 긴 문장 텍스트
-    const quotes = {
-      Han1: { en: "If it can be expressed in one sentence, is it really art?", ko: "한 문장으로 표현이 가능하다면, 그게 예술이 맞는가?" },
-      Han2: { en: "If you think you can do it too, maybe you should try.", ko: "나도 할 수 있을 것 같다면, 한 번 해보는 것도 좋을듯." },
-      Han3: { en: "How many people truly equate art with life?", ko: "예술과 삶을 동일시 하는 사람이 몇이나 되겠는가." },
-      Han4: { en: "If uniqueness defines art, that idea is already outdated.", ko: "유일함이 예술의 특성이란 말은, 옛 말일 뿐이다." },
-      Han5: { en: "Uncomfortable to see, impossible to forget.", ko: "불편해서 눈을 피했지만, 계속 생각나더라." },
-      Han6: { en: "The more technology evolves, the more extraordinary the artist becomes.", ko: "기술이 발전할수록 예술가는 더 대단해진다." },
-      Han7: { en: "Perfect order leaves no room for imagination.", ko: "완벽한 질서는 상상력을 허용하지 않는다." },
-      Han8: { en: "Without a viewer, it's incomplete.", ko: "보는 이가 없으면, 미완성이다." },
-      Han9: { en: "If all you want is to speak the truth, go to a news studio, not a gallery.", ko: "진실만을 말하려면, 미술관이 아니라 방송국으로 가라." },
-      Han10: { en: "Some works retrieve forgotten memories like a thief.", ko: "어떤 작품은 잊고 있었던 기억을 도둑처럼 찾아낸다." }
-    };
+const quotes = {
+  Han1: {
+    en: "If it can be expressed in one sentence,\nis it really art?",
+    ko: "한 문장으로 표현이 가능하다면,\n그게 예술이 맞는가?"
+  },
+  Han2: {
+    en: "If you think you can do it too,\nmaybe you should try.",
+    ko: "나도 할 수 있을 것 같다면,\n한 번 해보는 것도 좋을듯."
+  },
+  Han3: {
+    en: "How many people truly equate\nart with life?",
+    ko: "예술과 삶을 동일시 하는 사람이\n몇이나 되겠는가."
+  },
+  Han4: {
+    en: "If uniqueness defines art,\nthat idea is already outdated.",
+    ko: "유일함이 예술의 특성이란 말은,\n옛 말일 뿐이다."
+  },
+  Han5: {
+    en: "Uncomfortable to see,\nimpossible to forget.",
+    ko: "불편해서 눈을 피했지만,\n계속 생각나더라."
+  },
+  Han6: {
+    en: "The more technology evolves,\nthe more extraordinary the artist becomes.",
+    ko: "기술이 발전할수록\n예술가는 더 대단해진다."
+  },
+  Han7: {
+    en: "Perfect order leaves\nno room for imagination.",
+    ko: "완벽한 질서는\n상상력을 허용하지 않는다."
+  },
+  Han8: {
+    en: "Without a viewer,\nit's incomplete.",
+    ko: "보는 이가 없으면,\n미완성이다."
+  },
+  Han9: {
+    en: "If all you want is to speak the truth,\ngo to a news studio, not a gallery.",
+    ko: "진실만을 말하려면,\n미술관이 아니라 방송국으로 가라."
+  },
+  Han10: {
+    en: "Some works retrieve forgotten memories\nlike a thief.",
+    ko: "어떤 작품은 잊고 있었던 기억을\n도둑처럼 찾아낸다."
+  }
+};
 
 let lang = 'en'; // ✅ 초기값은 영어
 const langBtn = document.getElementById('lang-toggle');
