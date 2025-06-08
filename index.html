@@ -111,7 +111,7 @@
   font-weight: bold;
   font-size: 14px;
   cursor: pointer;
-">KO/EN</button>
+">한/EN</button>
 
   <button id="color-toggle" style="
   position: absolute;
@@ -179,9 +179,7 @@ const langBtn = document.getElementById('lang-toggle');
 
 langBtn.addEventListener('click', () => {
   lang = (lang === 'en') ? 'ko' : 'en';
-  langBtn.textContent = (lang === 'en') ? 'KO' : 'EN';
-
-  // 기존 스티커 텍스트도 업데이트
+  langBtn.textContent = '한/EN';  // ✅ 항상 고정된 표시
   if (currentTextSticker && currentTextSticker.dataset.id) {
     const id = currentTextSticker.dataset.id;
     const quote = quotes[id];
