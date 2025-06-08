@@ -274,11 +274,22 @@ manualSaveBtn.addEventListener('click', () => {
   }
 
   const url = URL.createObjectURL(lastCaptureBlob);
-  window.open(url, '_blank'); // 유저가 길게 눌러 저장 가능
+  
+  // 버튼을 바로 <a> 역할로 바꿔버리기
+  manualSaveBtn.textContent = "🖼 이미지 저장 중...";
+  manualSaveBtn.style.pointerEvents = 'none'; // 다시 못 누르게
+
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'bubble.png';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 
   setTimeout(() => {
     URL.revokeObjectURL(url);
-  }, 3000);
+    manualSaveBtn.style.display = 'none'; // 버튼 숨김
+  }, 1000);
 });
     
   </script>
