@@ -315,29 +315,27 @@ document.querySelectorAll('.text-option').forEach(option => {
   const ctx = canvas.getContext('2d');
   ctx.drawImage(video, 0, 0, width, height);
 
-  // 스티커 렌더링
+// 스티커 렌더링
 document.querySelectorAll('.sticker, .text-sticker').forEach(el => {
   const rect = el.getBoundingClientRect();
   const scaleX = width / window.innerWidth;
   const scaleY = height / window.innerHeight;
-  const x = rect.left * scaleX;
-  const y = rect.top * scaleY;
-  const w = rect.width * scaleX;
-
+  const x = (rect.left + rect.width / 2) * scaleX;
+  const y = rect.top * scaleY + 10;
   const lines = el.textContent.split('\n');
-  const lineHeight = 30;
-  const h = lines.length * lineHeight;
 
-  const bg = window.getComputedStyle(el).backgroundColor;
-  const color = window.getComputedStyle(el).color;
+  // 배경
+  ctx.fillStyle = window.getComputedStyle(el).backgroundColor;
+  ctx.fillRect(rect.left * scaleX, rect.top * scaleY, rect.width * scaleX, rect.height * scaleY);
 
-  ctx.fillStyle = bg;
-  ctx.fillRect(x, y, w, h);
+  // 텍스트
+  ctx.font = '16px sans-serif'; // 글꼴 지정
+  ctx.fillStyle = window.getComputedStyle(el).color;
+  ctx.textAlign = 'center'; // 가운데 정렬
+  ctx.textBaseline = 'top';
 
-  ctx.fillStyle = color;
-  ctx.font = '24px sans-serif';
   lines.forEach((line, i) => {
-    ctx.fillText(line, x + 10, y + 30 + i * lineHeight);
+    ctx.fillText(line, x, y + i * 24);
   });
 });
 
