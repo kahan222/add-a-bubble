@@ -265,19 +265,30 @@ langBtn.addEventListener('click', () => {
   ctx.drawImage(video, 0, 0, width, height);
 
   // 스티커 렌더링
-  document.querySelectorAll('.sticker, .text-sticker').forEach(el => {
-    const rect = el.getBoundingClientRect();
-    const scaleX = width / window.innerWidth;
-    const scaleY = height / window.innerHeight;
-    ctx.font = '24px sans-serif';
-    ctx.fillStyle = 'white';
-    ctx.fillRect(rect.left * scaleX, rect.top * scaleY, rect.width * scaleX, rect.height * scaleY);
-    ctx.fillStyle = 'black';
-    const lines = el.textContent.split('\n');
-    lines.forEach((line, i) => {
-      ctx.fillText(line, rect.left * scaleX + 10, rect.top * scaleY + 30 + i * 30);
-    });
+document.querySelectorAll('.sticker, .text-sticker').forEach(el => {
+  const rect = el.getBoundingClientRect();
+  const scaleX = width / window.innerWidth;
+  const scaleY = height / window.innerHeight;
+  const x = rect.left * scaleX;
+  const y = rect.top * scaleY;
+  const w = rect.width * scaleX;
+
+  const lines = el.textContent.split('\n');
+  const lineHeight = 30;
+  const h = lines.length * lineHeight;
+
+  const bg = window.getComputedStyle(el).backgroundColor;
+  const color = window.getComputedStyle(el).color;
+
+  ctx.fillStyle = bg;
+  ctx.fillRect(x, y, w, h);
+
+  ctx.fillStyle = color;
+  ctx.font = '24px sans-serif';
+  lines.forEach((line, i) => {
+    ctx.fillText(line, x + 10, y + 30 + i * lineHeight);
   });
+});
 
   // 📤 공유 또는 다운로드
   canvas.toBlob(blob => {
