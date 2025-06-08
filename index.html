@@ -71,23 +71,22 @@
   <script>
     const video = document.getElementById('camera-view');
 
-    async function startCamera() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: { ideal: "environment" }, // 후면 우선, 없으면 전면으로 fallback
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-          },
-          audio: false
-        });
-        video.srcObject = stream;
-      } catch (err) {
-        console.error(err);
-        alert("카메라 접근 실패: " + err.message);
-      }
-    }
-
+async function startCamera() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: {
+        facingMode: { ideal: "environment" }, // 후면 우선
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      },
+      audio: false
+    });
+    video.srcObject = stream;
+  } catch (err) {
+    console.error(err);
+    alert("카메라 접근에 실패했습니다: " + err.message);
+  }
+}
     startCamera();
   </script>
 
