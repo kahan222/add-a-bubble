@@ -243,21 +243,26 @@ document.querySelectorAll('.text-option').forEach(option => {
     const quote = quotes[id];
     if (!quote) return;
 
-    const div = document.createElement('div');
-    div.className = 'text-sticker';
-    div.textContent = quote[lang];
-    div.dataset.id = id;
-    div.style.left = lastPosition.left;
-    div.style.top = lastPosition.top;
+const div = document.createElement('div');
+div.className = 'text-sticker';
+div.textContent = quote[lang];
+div.dataset.id = id;
+div.style.left = lastPosition.left;
+div.style.top = lastPosition.top;
 
-    makeDraggable(div);
+makeDraggable(div);
 
-    const theme = colorThemes[currentColorIndex];
-    div.style.background = theme.bg;
-    div.style.color = theme.color;
+// ✅ 네온 효과 적용
+const glow = neonColors[currentNeonIndex];
+div.style.textShadow = `
+  0 0 5px ${glow},
+  0 0 10px ${glow},
+  0 0 20px ${glow},
+  0 0 40px ${glow}
+`;
 
-    body.appendChild(div);
-    currentTextSticker = div;
+body.appendChild(div);
+currentTextSticker = div;
   });
 });
 
