@@ -135,6 +135,8 @@ captureBtn.addEventListener('click', () => {
   const ctx = canvas.getContext('2d');
   ctx.drawImage(video, 0, 0, width, height);
 
+  // 현재 언어에 따라 텍스트 선택
+  const text = (currentLang === 'en') ? quoteEn.textContent : quoteKo.textContent;
   const bubbleRect = bubble.getBoundingClientRect();
   const scaleX = width / window.innerWidth;
   const scaleY = height / window.innerHeight;
@@ -147,18 +149,18 @@ captureBtn.addEventListener('click', () => {
   ctx.textBaseline = "middle";
   ctx.shadowColor = "#00ff90";
   ctx.shadowBlur = 10;
-  ctx.fillText(bubble.textContent.trim(), x, y);
+  ctx.fillText(text.trim(), x, y);
 
-canvas.toBlob(blob => {
-  if (!blob) return;
-  lastCaptureBlob = blob;
-
-  document.getElementById('manual-save-btn').style.display = 'block';
-
-  video.style.display = 'none';
-  bubble.style.display = 'none';
-  captureBtn.style.display = 'none';
-}, 'image/png');
+  // 이미지 생성
+  canvas.toBlob(blob => {
+    if (!blob) {
+      alert("❌ 이미지 생성 실패");
+      return;
+    }
+    lastCaptureBlob = blob;
+    manualSaveBtn.style.display = 'block';
+    alert("📸 캡처 완료! 저장 버튼을 눌러주세요.");
+  }, 'image/png');
 });
    
     const quotes = {
@@ -264,21 +266,18 @@ canvas.toBlob(blob => {
         alert("카메라 접근 권한을 허용해주세요.");
       });
     
-document.getElementById('manual-save-btn').addEventListener('click', () => {
+manualSaveBtn.addEventListener('click', () => {
   if (!lastCaptureBlob) {
     alert("⚠️ 이미지가 준비되지 않았습니다.");
     return;
   }
-
+  
   const url = URL.createObjectURL(lastCaptureBlob);
-
-  // ✅ 안정적인 다운로드/공유 트리거 방식
   const a = document.createElement('a');
   a.href = url;
   a.download = 'bubble.png';
   a.click();
 
-  // 선택적으로 메모리 해제
   setTimeout(() => {
     URL.revokeObjectURL(url);
   }, 1000);
