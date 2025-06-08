@@ -315,8 +315,14 @@
       document.removeEventListener('touchend', stopDrag);
     }
 
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
-      .then(stream => video.srcObject = stream);
+navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+  .then(stream => {
+    video.srcObject = stream;
+  })
+  .catch(error => {
+    console.error("카메라 접근 실패:", error);
+    alert("카메라 접근 권한이 거부되었거나, 브라우저가 지원하지 않습니다.");
+  });
 
         function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
       const words = text.split(' ');
