@@ -94,17 +94,6 @@
     <div class="text-option" data-id="Han10"><div class="name-en">Thief</div><div class="name-ko">도둑</div></div>
   </div>
 
-  <div class="sticker-bar" id="sticker-bar">
-    <div class="sticker-option">Why so serious?</div>
-    <div class="sticker-option">Like it.</div>
-    <div class="sticker-option">Masterpiece.</div>
-    <div class="sticker-option">No cap</div>
-    <div class="sticker-option">No comment.</div>
-    <div class="sticker-option">I don’t get it.</div>
-    <div class="sticker-option">????????????????????</div>
-    <div class="sticker-option">Nice try.</div>
-  </div>
-
   <button id="capture-btn">📸 Capture</button>
   <canvas id="canvas" style="display: none;"></canvas>
 
@@ -123,22 +112,6 @@
         };
       })
       .catch(err => alert("카메라에 접근할 수 없습니다: " + err.message));
-
-    // 스티커 (짧은 문구)
-    let currentSticker = null;
-    document.querySelectorAll('.sticker-option').forEach(option => {
-      option.addEventListener('click', () => {
-        if (currentSticker) currentSticker.remove();
-        const div = document.createElement('div');
-        div.className = 'sticker';
-        div.textContent = option.textContent;
-        div.style.left = '50px';
-        div.style.top = '50px';
-        makeDraggable(div);
-        body.appendChild(div);
-        currentSticker = div;
-      });
-    });
 
     // 긴 문장 텍스트
     const quotes = {
