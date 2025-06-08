@@ -247,8 +247,16 @@ const div = document.createElement('div');
 div.className = 'text-sticker';
 div.textContent = quote[lang];
 div.dataset.id = id;
-div.style.left = lastPosition.left;
-div.style.top = lastPosition.top;
+    
+// 스티커가 처음 선택될 경우 중앙 정렬
+if (lastPosition.left && lastPosition.top) {
+  div.style.left = lastPosition.left;
+  div.style.top = lastPosition.top;
+} else {
+  // 처음이면 화면 중앙 정렬
+  div.style.left = (window.innerWidth / 2 - 100) + 'px';  // 대략 스티커 너비 절반 보정
+  div.style.top = (window.innerHeight / 2 - 30) + 'px';   // 대략 높이 보정
+}
 
 makeDraggable(div);
 
