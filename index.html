@@ -152,22 +152,20 @@ captureBtn.addEventListener('click', () => {
 
   canvas.toBlob(blob => {
     lastCaptureBlob = blob;
-    saveShareBtn.style.display = 'block';
+
+    // ✅ 여기에 미리보기 이미지와 저장 버튼 보여주기
+    const url = URL.createObjectURL(blob);
+    document.getElementById('preview-img').src = url;
+    document.getElementById('preview-img').style.display = 'block';
+    document.getElementById('manual-save-btn').style.display = 'block';
+
+    // 📷 UI 요소 숨기기
     video.style.display = 'none';
     bubble.style.display = 'none';
     captureBtn.style.display = 'none';
   }, 'image/png');
 });
-      const url = URL.createObjectURL(blob);
-  document.getElementById('preview-img').src = url;
-  document.getElementById('preview-img').style.display = 'block';
-  document.getElementById('manual-save-btn').style.display = 'block';
-
-  video.style.display = 'none';
-  bubble.style.display = 'none';
-  captureBtn.style.display = 'none';
-}, 'image/png');
-    
+   
     const quotes = {
       Han1: { en: "If it can be expressed in one sentence, is it really art?", ko: "한 문장으로 표현이 가능하다면, 그게 예술이 맞는가?" },
       Han2: { en: "If you think you can do it too, maybe you should try.", ko: "나도 할 수 있을 것 같다면, 한 번 해보는 것도 좋을듯." },
