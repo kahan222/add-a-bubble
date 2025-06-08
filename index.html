@@ -78,6 +78,63 @@
       font-weight: bold;
       cursor: pointer;
     }
+#toggle-effect {
+  position: absolute;
+  bottom: 100px;
+  right: 20px;
+  z-index: 10;
+  background: white;
+  border: none;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.bubble-style-white-green {
+  color: white;
+  text-shadow:
+    0 0 5px #00ff90,
+    0 0 10px #00ff90,
+    0 0 20px #00ff90;
+}
+.bubble-style-white-orange {
+  color: white;
+  text-shadow:
+    0 0 5px #ffaa00,
+    0 0 10px #ffaa00,
+    0 0 20px #ffaa00;
+}
+.bubble-style-white-blue {
+  color: white;
+  text-shadow:
+    0 0 5px #00ccff,
+    0 0 10px #00ccff,
+    0 0 20px #00ccff;
+}
+.bubble-style-black-green {
+  color: black;
+  text-shadow:
+    0 0 5px #00ff90,
+    0 0 10px #00ff90,
+    0 0 20px #00ff90;
+}
+.bubble-style-black-orange {
+  color: black;
+  text-shadow:
+    0 0 5px #ffaa00,
+    0 0 10px #ffaa00,
+    0 0 20px #ffaa00;
+}
+.bubble-style-black-blue {
+  color: black;
+  text-shadow:
+    0 0 5px #00ccff,
+    0 0 10px #00ccff,
+    0 0 20px #00ccff;
+}
+
   </style>
 </head>
 <body>
@@ -99,6 +156,7 @@
 
 <div id="bubble-text"></div>
 <button id="toggle-lang">KO / EN</button>
+  <button id="toggle-effect">Effect</button>
 
 <script>
   const video = document.getElementById('camera-view');
@@ -141,6 +199,24 @@
   document.getElementById('toggle-lang').addEventListener('click', () => {
     currentLang = currentLang === 'en' ? 'ko' : 'en';
     updateLangVisibility();
+
+const effectClasses = [
+  'bubble-style-white-green',
+  'bubble-style-white-orange',
+  'bubble-style-white-blue',
+  'bubble-style-black-green',
+  'bubble-style-black-orange',
+  'bubble-style-black-blue'
+];
+let currentEffectIndex = 0;
+bubble.classList.add(effectClasses[0]);
+
+document.getElementById('toggle-effect').addEventListener('click', () => {
+  bubble.classList.remove(effectClasses[currentEffectIndex]);
+  currentEffectIndex = (currentEffectIndex + 1) % effectClasses.length;
+  bubble.classList.add(effectClasses[currentEffectIndex]);
+});
+
   });
 
   // === 드래그 기능 추가 ===
