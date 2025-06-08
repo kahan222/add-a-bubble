@@ -342,10 +342,18 @@ document.querySelectorAll('.sticker, .text-sticker').forEach(el => {
 
   // 텍스트
 const glowColor = window.getComputedStyle(el).color;
-ctx.font = '16px sans-serif';
-ctx.fillStyle = glowColor;
-ctx.shadowColor = glowColor;
-ctx.shadowBlur = 20;
+const shadow = window.getComputedStyle(el).textShadow;
+
+// textShadow가 여러 색상이라면 첫 번째만 추출
+const match = shadow.match(/rgba?\([^)]+\)|#[0-9a-fA-F]+/);
+const neonColor = match ? match[0] : glowColor;
+
+ctx.font = '20px sans-serif';
+ctx.fillStyle = 'white';              // 기본 텍스트 색상
+ctx.shadowColor = neonColor;          // 네온 색상
+ctx.shadowBlur = 15;                  // 네온 확산 효과
+ctx.shadowOffsetX = 0;
+ctx.shadowOffsetY = 0;
 ctx.textAlign = 'center';
 ctx.textBaseline = 'top';
 
