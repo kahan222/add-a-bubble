@@ -95,7 +95,10 @@
 <body>
   <video id="camera-view" autoplay playsinline muted></video>
 
-<a id="manual-save-btn" style="display:none; position:fixed; bottom:100px; left:50%; transform:translateX(-50%); z-index:10; font-size:16px; padding:10px 20px; background:white; border:none; border-radius:10px; font-weight:bold;">📥 저장</a>
+<a id="manual-save-btn"
+   style="display:none; position:fixed; bottom:100px; left:50%; transform:translateX(-50%); z-index:10; font-size:16px; padding:10px 20px; background:white; border-radius:10px; font-weight:bold; text-decoration:none; color:black;">
+  📥 이미지 저장
+</a>
   
   <div class="text-carousel">
     <div class="text-option" data-id="Han1"><div class="name-en">One Sentence</div><div class="name-ko">한 문장</div></div>
@@ -162,11 +165,13 @@ canvas.toBlob(blob => {
   lastCaptureBlob = blob;
   const url = URL.createObjectURL(blob);
 
-  manualSaveBtn.textContent = "👉 이미지 저장하기";
+  manualSaveBtn.textContent = "📥 이미지 저장";
   manualSaveBtn.setAttribute('href', url);
   manualSaveBtn.setAttribute('download', 'bubble.png');
   manualSaveBtn.style.display = 'block';
-  manualSaveBtn.onclick = null; // 기존 이벤트 제거
+
+  // iOS 대응을 위해 'a.click()'은 사용하지 않음
+  alert("✅ 캡처 완료! 아래 버튼을 직접 눌러 저장하세요.");
 }, 'image/png');
 });
    
