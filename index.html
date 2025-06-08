@@ -333,14 +333,17 @@ document.querySelectorAll('.sticker, .text-sticker').forEach(el => {
   ctx.fillRect(rect.left * scaleX, rect.top * scaleY, rect.width * scaleX, rect.height * scaleY);
 
   // 텍스트
-  ctx.font = '16px sans-serif'; // 글꼴 지정
-  ctx.fillStyle = window.getComputedStyle(el).color;
-  ctx.textAlign = 'center'; // 가운데 정렬
-  ctx.textBaseline = 'top';
+const glowColor = window.getComputedStyle(el).color;
+ctx.font = '16px sans-serif';
+ctx.fillStyle = glowColor;
+ctx.shadowColor = glowColor;
+ctx.shadowBlur = 20;
+ctx.textAlign = 'center';
+ctx.textBaseline = 'top';
 
-  lines.forEach((line, i) => {
-    ctx.fillText(line, x, y + i * 24);
-  });
+lines.forEach((line, i) => {
+  ctx.fillText(line, x, y + i * 24);
+});
 });
 
   // 📤 공유 또는 다운로드
