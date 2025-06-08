@@ -275,7 +275,17 @@ document.getElementById('manual-save-btn').addEventListener('click', () => {
   }
 
   const url = URL.createObjectURL(lastCaptureBlob);
-  window.open(url, '_blank'); // 새 탭에서 이미지 열기 → 저장/공유 유도
+
+  // ✅ 안정적인 다운로드/공유 트리거 방식
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'bubble.png';
+  a.click();
+
+  // 선택적으로 메모리 해제
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 1000);
 });
     
   </script>
