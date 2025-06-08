@@ -362,26 +362,54 @@ lines.forEach((line, i) => {
 });
 
   // 📤 공유 또는 다운로드
-  canvas.toBlob(blob => {
-    const file = new File([blob], 'bubble-capture.png', { type: 'image/png' });
+canvas.toBlob(blob => {
+  const preview = document.getElementById('preview-container');
+  const img = document.getElementById('preview-img');
+  const shareBtn = document.getElementById('share-btn');
+  const downloadBtn = document.getElementById('download-btn');
+  const retakeBtn = document.getElementById('retake-btn');
 
+  const url = URL.createObjectURL(blob);
+  img.src = url;
+  preview.style.display = 'flex';
+
+  const file = new File([blob], 'bubble-capture.png', { type: 'image/png' });
+
+  shareBtn.onclick = () => {
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       navigator.share({
         files: [file],
         title: 'Add a Bubble',
         text: 'Check out my AR bubble image!',
       }).catch(err => {
-        console.warn('공유 취소됨 또는 실패:', err);
+        alert('공유가 실패했어요.');
       });
     } else {
-      // fallback 다운로드
-      const link = document.createElement('a');
-      link.download = 'bubble-capture.png';
-      link.href = URL.createObjectURL(blob);
-      link.click();
+      alert('이 기기에서는 공유가 지원되지 않습니다.');
     }
-  }, 'image/png');
+  };
+
+  downloadBtn.onclick = () => {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'bubble-capture.png';
+    a.click();
+  };
+
+  retakeBtn.onclick = () => {
+    preview.style.display = 'none';
+    URL.revokeObjectURL(url);
+  };
+}, 'image/png');
 });
   </script>
+  <div id="preview-container" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: black; z-index: 100; flex-direction: column; align-items: center; justify-content: center;">
+  <img id="preview-img" style="max-width: 90%; max-height: 70%; margin-bottom: 20px;" />
+  <div style="display: flex; gap: 10px;">
+    <button id="share-btn" style="padding: 10px 16px; font-weight: bold;">📤 공유</button>
+    <button id="download-btn" style="padding: 10px 16px; font-weight: bold;">📥 저장</button>
+    <button id="retake-btn" style="padding: 10px 16px; font-weight: bold;">🔄 다시 찍기</button>
+  </div>
+</div>
 </body>
 </html>
