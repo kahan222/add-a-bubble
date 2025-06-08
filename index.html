@@ -204,6 +204,8 @@ langBtn.addEventListener('click', () => {
         div.style.left = '30px';
         div.style.top = '30px';
         makeDraggable(div);
+        div.style.background = theme.bg;
+        div.style.color = theme.color;
         body.appendChild(div);
         currentTextSticker = div;
       });
