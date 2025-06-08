@@ -193,35 +193,56 @@ langBtn.addEventListener('click', () => {
     }
 
     // 캡처 기능
-    captureBtn.addEventListener('click', () => {
-      const width = video.videoWidth;
-      const height = video.videoHeight;
-      if (width === 0 || height === 0) {
-        alert("카메라 영상이 아직 준비되지 않았습니다.");
-        return;
-      }
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-      ctx.drawImage(video, 0, 0, width, height);
-      document.querySelectorAll('.sticker, .text-sticker').forEach(el => {
-        const rect = el.getBoundingClientRect();
-        const scaleX = width / window.innerWidth;
-        const scaleY = height / window.innerHeight;
-        ctx.font = '24px sans-serif';
-        ctx.fillStyle = 'white';
-        ctx.fillRect(rect.left * scaleX, rect.top * scaleY, rect.width * scaleX, rect.height * scaleY);
-        ctx.fillStyle = 'black';
-        const lines = el.textContent.split('\n');
-        lines.forEach((line, i) => {
-          ctx.fillText(line, rect.left * scaleX + 10, rect.top * scaleY + 30 + i * 30);
-        });
+   captureBtn.addEventListener('click', () => {
+  const width = video.videoWidth;
+  const height = video.videoHeight;
+
+  if (width === 0 || height === 0) {
+    alert("카메라 영상이 아직 준비되지 않았습니다.");
+    return;
+  }
+
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, width, height);
+
+  // 스티커 렌더링
+  document.querySelectorAll('.sticker, .text-sticker').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    const scaleX = width / window.innerWidth;
+    const scaleY = height / window.innerHeight;
+    ctx.font = '24px sans-serif';
+    ctx.fillStyle = 'white';
+    ctx.fillRect(rect.left * scaleX, rect.top * scaleY, rect.width * scaleX, rect.height * scaleY);
+    ctx.fillStyle = 'black';
+    const lines = el.textContent.split('\n');
+    lines.forEach((line, i) => {
+      ctx.fillText(line, rect.left * scaleX + 10, rect.top * scaleY + 30 + i * 30);
+    });
+  });
+
+  // 📤 공유 또는 다운로드
+  canvas.toBlob(blob => {
+    const file = new File([blob], 'bubble-capture.png', { type: 'image/png' });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({
+        files: [file],
+        title: 'Add a Bubble',
+        text: 'Check out my AR bubble image!',
+      }).catch(err => {
+        console.warn('공유 취소됨 또는 실패:', err);
       });
+    } else {
+      // fallback 다운로드
       const link = document.createElement('a');
       link.download = 'bubble-capture.png';
-      link.href = canvas.toDataURL('image/png');
+      link.href = URL.createObjectURL(blob);
       link.click();
-    });
+    }
+  }, 'image/png');
+});
   </script>
 </body>
 </html>
