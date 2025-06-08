@@ -191,7 +191,9 @@ langBtn.addEventListener('click', () => {
     
     let currentTextSticker = null;
     document.querySelectorAll('.text-option').forEach(option => {
-      option.addEventListener('click', () => {
+    option.addEventListener('click', () => {
+    document.querySelectorAll('.text-option').forEach(opt => opt.classList.remove('selected'));
+    option.classList.add('selected');
         const id = option.dataset.id;
         const quote = quotes[id];
         if (!quote) return;
