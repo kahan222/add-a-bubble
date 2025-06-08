@@ -155,6 +155,16 @@ captureBtn.addEventListener('click', () => {
     saveShareBtn.style.display = 'block';
   }, 'image/png');
 });
+      const url = URL.createObjectURL(blob);
+  document.getElementById('preview-img').src = url;
+  document.getElementById('preview-img').style.display = 'block';
+  document.getElementById('manual-save-btn').style.display = 'block';
+
+  video.style.display = 'none';
+  bubble.style.display = 'none';
+  captureBtn.style.display = 'none';
+}, 'image/png');
+    
     const quotes = {
       Han1: { en: "If it can be expressed in one sentence, is it really art?", ko: "한 문장으로 표현이 가능하다면, 그게 예술이 맞는가?" },
       Han2: { en: "If you think you can do it too, maybe you should try.", ko: "나도 할 수 있을 것 같다면, 한 번 해보는 것도 좋을듯." },
@@ -257,24 +267,26 @@ captureBtn.addEventListener('click', () => {
         console.error("카메라 접근 실패:", err);
         alert("카메라 접근 권한을 허용해주세요.");
       });
+    
+document.getElementById('manual-save-btn').addEventListener('click', () => {
+  if (!lastCaptureBlob) return;
+
+  const url = URL.createObjectURL(lastCaptureBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'bubble.png';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  alert("✅ 저장이 완료되었습니다.");
+  location.reload(); // 초기화
+});
+    
 saveShareBtn.addEventListener('click', async () => {
   if (!lastCaptureBlob) return;
 
-  // 다운로드 저장
-  const url = URL.createObjectURL(lastCaptureBlob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = 'bubble.png';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-
-  // 업로드 (선택적으로 imgbb + firestore 연동 가능)
-  // await uploadCapturedImage(lastCaptureBlob);
-
-  alert("✅ 저장 및 공유가 완료되었습니다.");
-  location.reload(); // 초기화
 });
     
   </script>
