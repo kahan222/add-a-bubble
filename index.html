@@ -95,7 +95,7 @@
 <body>
   <video id="camera-view" autoplay playsinline muted></video>
 
-<button id="manual-save-btn" style="display:none; position:fixed; bottom:100px; left:50%; transform:translateX(-50%); z-index:10; font-size:16px; padding:10px 20px; background:white; border:none; border-radius:10px; font-weight:bold;">📥 저장</button>
+<a id="manual-save-btn" style="display:none; position:fixed; bottom:100px; left:50%; transform:translateX(-50%); z-index:10; font-size:16px; padding:10px 20px; background:white; border:none; border-radius:10px; font-weight:bold;">📥 저장</a>
   
   <div class="text-carousel">
     <div class="text-option" data-id="Han1"><div class="name-en">One Sentence</div><div class="name-ko">한 문장</div></div>
@@ -152,16 +152,22 @@ captureBtn.addEventListener('click', () => {
   ctx.shadowBlur = 10;
   ctx.fillText(text.trim(), x, y);
 
-  // 이미지 생성
-  canvas.toBlob(blob => {
-    if (!blob) {
-      alert("❌ 이미지 생성 실패");
-      return;
-    }
-    lastCaptureBlob = blob;
-    manualSaveBtn.style.display = 'block';
-    alert("📸 캡처 완료! 저장 버튼을 눌러주세요.");
-  }, 'image/png');
+// 캡처가 끝나면 버튼을 <a>로 바꾸는 방식
+canvas.toBlob(blob => {
+  if (!blob) {
+    alert("❌ 이미지 생성 실패");
+    return;
+  }
+
+  lastCaptureBlob = blob;
+  const url = URL.createObjectURL(blob);
+
+  manualSaveBtn.textContent = "👉 이미지 저장하기";
+  manualSaveBtn.setAttribute('href', url);
+  manualSaveBtn.setAttribute('download', 'bubble.png');
+  manualSaveBtn.style.display = 'block';
+  manualSaveBtn.onclick = null; // 기존 이벤트 제거
+}, 'image/png');
 });
    
     const quotes = {
