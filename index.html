@@ -151,15 +151,22 @@ captureBtn.addEventListener('click', () => {
   ctx.fillText(bubble.textContent.trim(), x, y);
 
   canvas.toBlob(blob => {
-    lastCaptureBlob = blob;
+    if (!blob) {
+      alert("❌ 이미지 캡처 실패");
+      return;
+    }
 
-    // ✅ 여기에 미리보기 이미지와 저장 버튼 보여주기
+      lastCaptureBlob = blob;
+
+    // ✅ 이미지 미리보기 보여주기
     const url = URL.createObjectURL(blob);
     document.getElementById('preview-img').src = url;
     document.getElementById('preview-img').style.display = 'block';
+
+    // ✅ 저장 버튼 보이기
     document.getElementById('manual-save-btn').style.display = 'block';
 
-    // 📷 UI 요소 숨기기
+    // ❌ 비디오/버튼 숨기기
     video.style.display = 'none';
     bubble.style.display = 'none';
     captureBtn.style.display = 'none';
