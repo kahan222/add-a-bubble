@@ -5,94 +5,162 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Add a Bubble</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body {
-      width: 100vw;
-      height: 100vh;
+      width: 100%;
+      height: 100%;
       overflow: hidden;
       font-family: sans-serif;
       background: black;
     }
-
     #camera-view {
       position: fixed;
-      top: 0;
-      left: 0;
+      top: 0; left: 0;
       width: 100vw;
       height: 100vh;
       object-fit: cover;
       z-index: -1;
     }
-
+    .sticker {
+      position: absolute;
+      font-size: 24px;
+      background: white;
+      color: black;
+      padding: 4px 10px;
+      border-radius: 12px;
+      cursor: move;
+      white-space: nowrap;
+    }
     .sticker-bar {
       position: absolute;
       bottom: 0;
-      width: 100vw;
-      height: 80px;
-      background: rgba(0, 0, 0, 0.5);
+      width: 100%;
       display: flex;
       overflow-x: auto;
-      padding: 10px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 8px;
       z-index: 10;
-      gap: 10px;
     }
-
-    .sticker {
+    .sticker-option {
       background: white;
       color: black;
-      padding: 10px 14px;
+      padding: 6px 12px;
       border-radius: 20px;
-      font-size: 16px;
-      white-space: nowrap;
+      margin-right: 10px;
       cursor: pointer;
       user-select: none;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
-
-    .sticker:hover {
-      background: #ddd;
+    #capture-btn {
+      position: absolute;
+      bottom: 90px;
+      right: 20px;
+      padding: 10px 18px;
+      background: white;
+      color: black;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      z-index: 11;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
+  <video id="camera-view" autoplay playsinline></video>
 
-  <!-- 📷 Camera -->
-  <video id="camera-view" autoplay playsinline muted></video>
-
-  <!-- 💬 Sticker Bar -->
-  <div class="sticker-bar">
-    <div class="sticker">Like it</div>
-    <div class="sticker">No comment</div>
-    <div class="sticker">????????</div>
-    <div class="sticker">Why so serious?</div>
+  <div class="sticker-bar" id="sticker-bar">
+    <div class="sticker-option">Why so serious?</div>
+    <div class="sticker-option">Like it.</div>
+    <div class="sticker-option">Masterpiece.</div>
+    <div class="sticker-option">No cap</div>
+    <div class="sticker-option">No comment.</div>
+    <div class="sticker-option">I don’t get it.</div>
+    <div class="sticker-option">????????????????????</div>
+    <div class="sticker-option">Nice try.</div>
   </div>
 
-  <!-- 📜 Script -->
-<script>
-  const video = document.getElementById('camera-view');
+  <button id="capture-btn">📸 Capture</button>
 
-  async function startCamera() {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: { ideal: "environment" },  // 후면 우선 요청
-          width: { ideal: 1280 },
-          height: { ideal: 720 }
-        },
-        audio: false
+  <canvas id="canvas" style="display: none;"></canvas>
+
+  <script>
+    const video = document.getElementById('camera-view');
+    const stickerBar = document.getElementById('sticker-bar');
+    const captureBtn = document.getElementById('capture-btn');
+    const canvas = document.getElementById('canvas');
+    const body = document.body;
+
+    // 카메라 실행
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+      .then(stream => {
+        video.srcObject = stream;
+      })
+      .catch(err => {
+        alert("카메라에 접근할 수 없습니다: " + err);
       });
-      video.srcObject = stream;
-      console.log("🎥 카메라 스트림 연결됨");
-    } catch (err) {
-      console.error("❌ 카메라 오류:", err);
-      alert("카메라 접근 실패: " + err.message);
-    }
-  }
 
-  window.addEventListener('DOMContentLoaded', () => {
-    startCamera();
-  });
-</script>
+    // 스티커 생성
+    stickerBar.querySelectorAll('.sticker-option').forEach(option => {
+      option.addEventListener('click', () => {
+        const div = document.createElement('div');
+        div.className = 'sticker';
+        div.textContent = option.textContent;
+        div.style.left = '50px';
+        div.style.top = '50px';
 
+        // 드래그 기능
+        let offsetX, offsetY, isDragging = false;
+
+        div.addEventListener('mousedown', e => {
+          isDragging = true;
+          offsetX = e.offsetX;
+          offsetY = e.offsetY;
+        });
+
+        document.addEventListener('mousemove', e => {
+          if (isDragging) {
+            div.style.left = (e.pageX - offsetX) + 'px';
+            div.style.top = (e.pageY - offsetY) + 'px';
+          }
+        });
+
+        document.addEventListener('mouseup', () => {
+          isDragging = false;
+        });
+
+        body.appendChild(div);
+      });
+    });
+
+    // 캡처 버튼
+    captureBtn.addEventListener('click', () => {
+      const width = video.videoWidth;
+      const height = video.videoHeight;
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0, width, height);
+
+      // 스티커 캡처
+      document.querySelectorAll('.sticker').forEach(sticker => {
+        const rect = sticker.getBoundingClientRect();
+        const x = rect.left;
+        const y = rect.top;
+        ctx.font = '24px sans-serif';
+        ctx.fillStyle = 'white';
+        ctx.fillRect(x, y, rect.width, rect.height);
+        ctx.fillStyle = 'black';
+        ctx.fillText(sticker.textContent, x + 10, y + 30);
+      });
+
+      // 저장
+      const link = document.createElement('a');
+      link.download = 'bubble-capture.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+  </script>
 </body>
 </html>
