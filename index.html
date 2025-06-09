@@ -393,31 +393,31 @@ canvas.toBlob(blob => {
 
   const file = new File([blob], 'bubble-capture.png', { type: 'image/png' });
 
-shareBtn.onclick = () => {
-  const filename = `capture_${Date.now()}.png`;
-  const storageRef = storage.ref().child('screenshots/' + filename);
-
-  storageRef.put(file).then(snapshot => {
-    snapshot.ref.getDownloadURL().then(url => {
-      db.collection('screenshots').add({
-        url,
-        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-      }).then(() => {
-        alert("업로드가 완료되었습니다!");
-      }).catch(err => {
-        alert("Firestore 저장 실패: " + err.message);
-      });
-    });
-  }).catch(err => {
-    alert("Storage 업로드 실패: " + err.message);
-  });
-};
-
   downloadBtn.onclick = () => {
     const a = document.createElement('a');
     a.href = url;
     a.download = 'bubble-capture.png';
     a.click();
+  };
+
+  shareBtn.onclick = () => {
+    const filename = `capture_${Date.now()}.png`;
+    const storageRef = storage.ref().child('screenshots/' + filename);
+
+    storageRef.put(file).then(snapshot => {
+      snapshot.ref.getDownloadURL().then(url => {
+        db.collection('screenshots').add({
+          imageUrl: url,
+          timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+          alert("업로드가 완료되었습니다!");
+        }).catch(err => {
+          alert("Firestore 저장 실패: " + err.message);
+        });
+      });
+    }).catch(err => {
+      alert("Storage 업로드 실패: " + err.message);
+    });
   };
 
   retakeBtn.onclick = () => {
