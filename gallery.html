@@ -56,24 +56,23 @@
 
     const gallery = document.getElementById("gallery");
 
-    db.collection("screenshots")
-      .orderBy("timestamp", "desc")
-      .get()
-      .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
+db.collection("screenshots")
+  .orderBy("timestamp", "desc")
+  .onSnapshot((querySnapshot) => {
+    gallery.innerHTML = '';  // 기존 이미지 비우기
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
+      const card = document.createElement("div");
+      card.className = "card";
 
-          const card = document.createElement("div");
-          card.className = "card";
+      const img = document.createElement("img");
+      img.src = data.url || data.imageUrl;
+      img.alt = "관객 스크린샷";
 
-          const img = document.createElement("img");
-          img.src = data.imageUrl;
-          img.alt = "관객 스크린샷";
-
-          card.appendChild(img);
-          gallery.appendChild(card);
-        });
-      })
+      card.appendChild(img);
+      gallery.appendChild(card);
+    });
+  });
       .catch((error) => {
         console.error("불러오기 오류:", error);
       });
