@@ -100,8 +100,8 @@
 }
   </style>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
 </head>
 <body>
   <video id="camera-view" autoplay playsinline muted></video>
@@ -164,8 +164,8 @@
   };
 
   firebase.initializeApp(firebaseConfig);
-  const storage = firebase.storage();
-  const db = firebase.firestore();
+    const storage = firebase.storage();
+    const db = firebase.firestore();
     
     const video = document.getElementById('camera-view');
     const captureBtn = document.getElementById('capture-btn');
@@ -400,21 +400,25 @@ canvas.toBlob(blob => {
     a.click();
   };
 
-  shareBtn.onclick = () => {
-    const filename = `capture_${Date.now()}.png`;
-    const storageRef = storage.ref().child('screenshots/' + filename);
+shareBtn.onclick = () => {
+  const filename = `capture_${Date.now()}.png`;
+  const storageRef = storage.ref().child('screenshots/' + filename);
 
-    storageRef.put(file).then(snapshot => {
-      snapshot.ref.getDownloadURL().then(url => {
-        db.collection('screenshots').add({
-          imageUrl: url,
-          timestamp: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(() => {
-          alert("업로드가 완료되었습니다!");
-        }).catch(err => {
-          alert("Firestore 저장 실패: " + err.message);
-        });
+  storageRef.put(file).then(snapshot => {
+    snapshot.ref.getDownloadURL().then(url => {
+      db.collection('screenshots').add({
+        imageUrl: url,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        alert("업로드가 완료되었습니다!");
+      }).catch(err => {
+        alert("Firestore 저장 실패: " + err.message);
       });
+    });
+  }).catch(err => {
+    alert("Storage 업로드 실패: " + err.message);
+  });
+};
     }).catch(err => {
       alert("Storage 업로드 실패: " + err.message);
     });
