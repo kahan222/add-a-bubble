@@ -423,6 +423,7 @@ downloadBtn.onclick = () => {
   firebase.firestore().collection("screenshots").add({
     imageUrl: data.secure_url,
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  });
 })
 .catch(err => {
   alert("업로드 실패: " + err.message);
