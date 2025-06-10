@@ -404,7 +404,7 @@ const uploadTask = storageRef.child(filename).put(file);
     alert('이미지 업로드에 실패했어요: ' + err.message);
   });
 
-  shareBtn.onclick = () => {
+  saveBtn.onclick = () => {
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       navigator.share({
         files: [file],
@@ -418,7 +418,7 @@ const uploadTask = storageRef.child(filename).put(file);
     }
   };
 
-  downloadBtn.onclick = () => {
+  shareBtn.onclick = () => {
     const a = document.createElement('a');
     a.href = url;
     a.download = 'bubble-capture.png';
