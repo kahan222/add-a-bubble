@@ -98,6 +98,11 @@
   cursor: pointer;
 }
   </style>
+  
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  
 </head>
 <body>
   <video id="camera-view" autoplay playsinline muted></video>
@@ -149,6 +154,21 @@
   <canvas id="canvas" style="display: none;"></canvas>
 
   <script>
+    <script>
+// ✅ Firebase 설정
+const firebaseConfig = {
+  apiKey: "AIzaSyCtN3FJJs73iGyRY9IqwKM5-oQCDeW0qZo",
+  authDomain: "addabubble-aeeb7.firebaseapp.com",
+  projectId: "addabubble-aeeb7",
+  storageBucket: "addabubble-aeeb7.appspot.com",
+  messagingSenderId: "56279476270",
+  appId: "1:56279476270:web:7ece8c4916f8dc115f17bf"
+};
+
+firebase.initializeApp(firebaseConfig);
+const storage = firebase.storage();
+const db = firebase.firestore();
+
     const video = document.getElementById('camera-view');
     const captureBtn = document.getElementById('capture-btn');
     const canvas = document.getElementById('canvas');
