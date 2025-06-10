@@ -98,11 +98,6 @@
   cursor: pointer;
 }
   </style>
-  
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
-  
 </head>
 <body>
   <video id="camera-view" autoplay playsinline muted></video>
@@ -154,21 +149,6 @@
   <canvas id="canvas" style="display: none;"></canvas>
 
   <script>
-    <script>
-// ✅ Firebase 설정
-const firebaseConfig = {
-  apiKey: "AIzaSyCtN3FJJs73iGyRY9IqwKM5-oQCDeW0qZo",
-  authDomain: "addabubble-aeeb7.firebaseapp.com",
-  projectId: "addabubble-aeeb7",
-  storageBucket: "addabubble-aeeb7.appspot.com",
-  messagingSenderId: "56279476270",
-  appId: "1:56279476270:web:7ece8c4916f8dc115f17bf"
-};
-
-firebase.initializeApp(firebaseConfig);
-const storage = firebase.storage();
-const db = firebase.firestore();
-
     const video = document.getElementById('camera-view');
     const captureBtn = document.getElementById('capture-btn');
     const canvas = document.getElementById('canvas');
@@ -395,23 +375,19 @@ canvas.toBlob(blob => {
 
   const file = new File([blob], 'bubble-capture.png', { type: 'image/png' });
 
-shareBtn.onclick = () => {
-  const filename = `capture_${Date.now()}.png`;
-  const storageRef = storage.ref().child('screenshots/' + filename);
-
-  storageRef.put(file).then(snapshot => {
-    return snapshot.ref.getDownloadURL();
-  }).then(downloadURL => {
-    return db.collection('screenshots').add({
-      imageUrl: downloadURL,
-      timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
-  }).then(() => {
-    alert("🫧 Bubble Archive에 업로드 완료!");
-  }).catch(err => {
-    alert("업로드 실패: " + err.message);
-  });
-};
+  shareBtn.onclick = () => {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({
+        files: [file],
+        title: 'Add a Bubble',
+        text: 'Check out my AR bubble image!',
+      }).catch(err => {
+        alert('공유가 실패했어요.');
+      });
+    } else {
+      alert('이 기기에서는 공유가 지원되지 않습니다.');
+    }
+  };
 
   downloadBtn.onclick = () => {
     const a = document.createElement('a');
