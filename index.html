@@ -98,6 +98,10 @@
   cursor: pointer;
 }
   </style>
+<!-- Firebase App (Core) -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+  
 </head>
 <body>
   <video id="camera-view" autoplay playsinline muted></video>
@@ -153,6 +157,21 @@
     const captureBtn = document.getElementById('capture-btn');
     const canvas = document.getElementById('canvas');
     const body = document.body;
+
+    // Firebase 설정
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "addabubble-aeeb7.firebaseapp.com",
+  projectId: "addabubble-aeeb7",
+  storageBucket: "addabubble-aeeb7.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+// 초기화
+firebase.initializeApp(firebaseConfig);
+const storage = firebase.storage();
+
 
     // 카메라 실행
     navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false })
@@ -374,6 +393,16 @@ canvas.toBlob(blob => {
   preview.style.display = 'flex';
 
   const file = new File([blob], 'bubble-capture.png', { type: 'image/png' });
+  const storageRef = storage.ref();
+const filename = `screenshots/${Date.now()}.png`;
+const uploadTask = storageRef.child(filename).put(file);
+  uploadTask
+  .then(() => {
+    console.log('이미지가 업로드되었습니다.');
+  })
+  .catch(err => {
+    alert('이미지 업로드에 실패했어요: ' + err.message);
+  });
 
   shareBtn.onclick = () => {
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
