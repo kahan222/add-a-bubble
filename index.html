@@ -98,9 +98,6 @@
   cursor: pointer;
 }
   </style>
-<!-- ✅ Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 </head>
 <body>
   <video id="camera-view" autoplay playsinline muted></video>
@@ -152,20 +149,6 @@
   <canvas id="canvas" style="display: none;"></canvas>
 
   <script>
-
-      const firebaseConfig = {
-    apiKey: "AIzaSyCtN3FJJs73iGyRY9IqwKM5-oQCDeW0qZo",
-    authDomain: "addabubble-aeeb7.firebaseapp.com",
-    projectId: "addabubble-aeeb7",
-    storageBucket: "addabubble-aeeb7.appspot.com",
-    messagingSenderId: "56279476270",
-    appId: "1:56279476270:web:7ece8c4916f8dc115f17bf"
-  };
-
-  // ✅ 초기화
-  firebase.initializeApp(firebaseConfig);
-  const storage = firebase.storage();
-    
     const video = document.getElementById('camera-view');
     const captureBtn = document.getElementById('capture-btn');
     const canvas = document.getElementById('canvas');
@@ -406,22 +389,12 @@ canvas.toBlob(blob => {
     }
   };
 
-downloadBtn.onclick = () => {
-  const file = new File([blob], 'bubble-capture.png', { type: 'image/png' });
-
-  const storageRef = storage.ref();
-  const filename = `screenshots/${Date.now()}.png`;
-  const uploadTask = storageRef.child(filename).put(file);
-
-  uploadTask
-    .then(() => {
-      alert('이미지가 가상 앨범에 업로드되었습니다.');
-      // window.location.href = 'https://kahan222.github.io/add-a-bubble/gallery.html'; // 자동 이동 원할 경우
-    })
-    .catch(err => {
-      alert('업로드 실패: ' + err.message);
-    });
-};
+  downloadBtn.onclick = () => {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'bubble-capture.png';
+    a.click();
+  };
 
   retakeBtn.onclick = () => {
     preview.style.display = 'none';
