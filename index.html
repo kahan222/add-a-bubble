@@ -393,19 +393,25 @@ canvas.toBlob(blob => {
 
   const file = new File([blob], 'bubble-capture.png', { type: 'image/png' });
 
-  shareBtn.onclick = () => {
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      navigator.share({
-        files: [file],
-        title: 'Add a Bubble',
-        text: 'Check out my AR bubble image!',
+shareBtn.onclick = () => {
+  const filename = `capture_${Date.now()}.png`;
+  const storageRef = storage.ref().child('screenshots/' + filename);
+
+  storageRef.put(file).then(snapshot => {
+    snapshot.ref.getDownloadURL().then(url => {
+      db.collection('screenshots').add({
+        imageUrl: url,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(() => {
+        alert("🫧 Bubble Archive에 업로드 완료!");
       }).catch(err => {
-        alert('공유가 실패했어요.');
+        alert("Firestore 저장 실패: " + err.message);
       });
-    } else {
-      alert('이 기기에서는 공유가 지원되지 않습니다.');
-    }
-  };
+    });
+  }).catch(err => {
+    alert("Storage 업로드 실패: " + err.message);
+  });
+};
 
   downloadBtn.onclick = () => {
     const a = document.createElement('a');
