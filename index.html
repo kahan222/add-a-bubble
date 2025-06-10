@@ -366,7 +366,7 @@ canvas.toBlob(blob => {
   const preview = document.getElementById('preview-container');
   const img = document.getElementById('preview-img');
   const saveBtn = document.getElementById('save-btn');
-  const downloadBtn = document.getElementById('download-btn');
+  const shareBtn = document.getElementById('share-btn');
   const retakeBtn = document.getElementById('retake-btn');
 
   const url = URL.createObjectURL(blob);
@@ -401,7 +401,7 @@ canvas.toBlob(blob => {
   <img id="preview-img" style="max-width: 90%; max-height: 70%; margin-bottom: 20px;" />
   <div style="display: flex; gap: 10px;">
     <button id="save-btn" style="padding: 10px 16px; font-weight: bold;">SAVE</button>
-    <button id="download-btn" style="padding: 10px 16px; font-weight: bold;">download</button>
+    <button id="share-btn" style="padding: 10px 16px; font-weight: bold;">share</button>
     <button id="retake-btn" style="padding: 10px 16px; font-weight: bold;">RESET</button>
   </div>
 </div>
