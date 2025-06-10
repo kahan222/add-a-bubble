@@ -407,20 +407,23 @@ canvas.toBlob(blob => {
   };
 
 downloadBtn.onclick = () => {
-  const file = new File([blob], 'bubble-capture.png', { type: 'image/png' });
+  const formData = new FormData();
+  formData.append("file", blob);
+  formData.append("upload_preset", "bubble"); // ← 너의 preset 이름
+  formData.append("folder", "bubble"); // ← Cloudinary 폴더명도 명시
 
-  const storageRef = storage.ref();
-  const filename = `screenshots/${Date.now()}.png`;
-  const uploadTask = storageRef.child(filename).put(file);
-
-  uploadTask
-    .then(() => {
-      alert('이미지가 가상 앨범에 업로드되었습니다.');
-      // window.location.href = 'https://kahan222.github.io/add-a-bubble/gallery.html'; // 자동 이동 원할 경우
-    })
-    .catch(err => {
-      alert('업로드 실패: ' + err.message);
-    });
+  fetch("https://api.cloudinary.com/v1_1/dzpqpwblv/image/upload", {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(data => {
+    alert("업로드 성공!\n이미지 URL: " + data.secure_url);
+    // 원한다면 gallery.html 에 이 secure_url 보내는 로직도 여기서 처리 가능
+  })
+  .catch(err => {
+    alert("업로드 실패: " + err.message);
+  });
 };
 
   retakeBtn.onclick = () => {
