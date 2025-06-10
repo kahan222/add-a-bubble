@@ -1,38 +1,28 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
   <meta charset="UTF-8">
-  <title>Bubble Gallery</title>
+  <title>Gallery</title>
   <style>
-    body { font-family: sans-serif; background: #fafafa; padding: 20px; }
-    h1 { font-size: 24px; }
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-    }
-    .gallery img {
-      width: 100%;
-      border-radius: 12px;
-    }
+    body { background: #fafafa; font-family: sans-serif; padding: 20px; }
+    .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+    .gallery img { width: 100%; border-radius: 8px; }
   </style>
 </head>
 <body>
-  <h1>🫧 Bubble Archive</h1>
+  <h1>🫧 실시간 앨범</h1>
   <div class="gallery" id="gallery"></div>
 
   <script>
     async function loadImages() {
-      const response = await fetch("https://res.cloudinary.com/dzpqpwblv/image/list/bubble.json");
-      const data = await response.json();
-
-      const container = document.getElementById("gallery");
-      container.innerHTML = "";
-
-      data.resources.reverse().forEach(item => {
-        const img = document.createElement("img");
-        img.src = `https://res.cloudinary.com/dzpqpwblv/image/upload/${item.public_id}.png`;
-        container.appendChild(img);
+      const res = await fetch('https://script.google.com/macros/s/AKfycbw9yz0V8DxtS_hKVf6ksIUub6Cc2jJheJi2bIPwQpNBuIdIpQbEqISf0rFYI9clQCeRjA/exec');
+      const data = await res.json();
+      const gallery = document.getElementById('gallery');
+      gallery.innerHTML = '';
+      data.reverse().forEach(item => {
+        const img = document.createElement('img');
+        img.src = item.base64;
+        gallery.appendChild(img);
       });
     }
 
