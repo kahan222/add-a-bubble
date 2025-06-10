@@ -100,7 +100,6 @@
   </style>
 <!-- ✅ Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 </head>
 <body>
@@ -154,7 +153,7 @@
 
   <script>
 
-    const firebaseConfig = {
+      const firebaseConfig = {
     apiKey: "AIzaSyCtN3FJJs73iGyRY9IqwKM5-oQCDeW0qZo",
     authDomain: "addabubble-aeeb7.firebaseapp.com",
     projectId: "addabubble-aeeb7",
@@ -408,32 +407,26 @@ canvas.toBlob(blob => {
   };
 
 downloadBtn.onclick = () => {
-  const formData = new FormData();
-  formData.append("file", blob);
-  formData.append("upload_preset", "bubble"); // ← 너의 preset 이름
-  formData.append("folder", "bubble"); // ← Cloudinary 폴더명도 명시
+  const file = new File([blob], 'bubble-capture.png', { type: 'image/png' });
 
-  fetch("https://api.cloudinary.com/v1_1/dzpqpwblv/image/upload", {
-    method: "POST",
-    body: formData
-  })
-  .then(res => res.json())
-  .then(data => {
-    alert("업로드 성공!\n이미지 URL: " + data.secure_url);
-  firebase.firestore().collection("screenshots").add({
-    imageUrl: data.secure_url,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  });
-})
-.catch(err => {
-  alert("업로드 실패: " + err.message);
-});
+  const storageRef = storage.ref();
+  const filename = `screenshots/${Date.now()}.png`;
+  const uploadTask = storageRef.child(filename).put(file);
+
+  uploadTask
+    .then(() => {
+      alert('이미지가 가상 앨범에 업로드되었습니다.');
+      // window.location.href = 'https://kahan222.github.io/add-a-bubble/gallery.html'; // 자동 이동 원할 경우
+    })
+    .catch(err => {
+      alert('업로드 실패: ' + err.message);
+    });
+};
 
   retakeBtn.onclick = () => {
     preview.style.display = 'none';
     URL.revokeObjectURL(url);
-   }; 
-  
+  };
 }, 'image/png');
 });
   </script>
