@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add a Bubble</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: sans-serif;
+      background: black;
+    }
+    #camera-view {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: 0;
+    }
+    .sticker {
+      position: absolute;
+      font-size: 24px;
+      background: white;
+      color: black;
+      padding: 4px 10px;
+      border-radius: 12px;
+      cursor: move;
+      white-space: pre-line;
+    }
+.text-sticker {
+  position: absolute;
+  font-size: 20px;
+  color: white;
+  background: none;
+  border: none;
+  text-align: center;
+  white-space: pre-line;
+  text-shadow:
+    0 0 5px #ffa500,
+    0 0 10px #ffa500,
+    0 0 20px #ffa500,
+    0 0 40px #ffa500;
+}
+    .sticker-bar, .text-carousel {
+      position: absolute;
+      width: 100%;
+      display: flex;
+      overflow-x: auto;
+      background: rgba(0,0,0,0.5);
+      padding: 6px;
+      z-index: 10;
+    }
+    .sticker-bar {
+      bottom: 0;
+    }
+    .text-carousel {
+      bottom: 20px;
+    }
+    .sticker-option, .text-option {
+      background: white;
+      color: black;
+      padding: 6px 12px;
+      border-radius: 20px;
+      margin-right: 10px;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+     .text-option.selected {
+      outline: 3px solid yellow;
+      background: #ffffcc;
+    }
+    .name-en {
+      font-weight: bold;
+    }
+    .name-ko {
+      font-size: 12px;
+    }
+#capture-btn {
+  position: absolute;
+  bottom: 150px;
+  left: 50%;
+  transform: translateX(-50%);  
+  padding: 12px 24px;
+  background: #d60000;        
+  color: white;       
+  border: none;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 16px;
+  z-index: 11;
+  cursor: pointer;
+}
+  </style>
+<!-- ✅ Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
+</head>
+<body>
+  <video id="camera-view" autoplay playsinline muted></video>
+
+<button id="lang-toggle" style="
+  position: absolute;
+  bottom: 110px;    
+  left: 20px;    
+  z-index: 12;
+  background: white;
+  color: black;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+">한/EN</button>
+
+  <button id="color-toggle" style="
+  position: absolute;
+  bottom: 110px;
+  right: 20px;
+  z-index: 12;
+  background: white;
+  color: black;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+">COLOR</button>
+  
+  <div class="text-carousel" id="text-carousel">
+    <div class="text-option" data-id="Han1"><div class="name-en">One Sentence</div><div class="name-ko">한 문장</div></div>
+    <div class="text-option" data-id="Han2"><div class="name-en">Try</div><div class="name-ko">시도</div></div>
+    <div class="text-option" data-id="Han3"><div class="name-en">Life</div><div class="name-ko">삶</div></div>
+    <div class="text-option" data-id="Han4"><div class="name-en">Uniqueness</div><div class="name-ko">유일함</div></div>
+    <div class="text-option" data-id="Han5"><div class="name-en">Uncomfortable</div><div class="name-ko">불편함</div></div>
+    <div class="text-option" data-id="Han6"><div class="name-en">Technology</div><div class="name-ko">기술</div></div>
+    <div class="text-option" data-id="Han7"><div class="name-en">Imagination</div><div class="name-ko">상상력</div></div>
+    <div class="text-option" data-id="Han8"><div class="name-en">Incomplete</div><div class="name-ko">미완성</div></div>
+    <div class="text-option" data-id="Han9"><div class="name-en">Truth</div><div class="name-ko">진실</div></div>
+    <div class="text-option" data-id="Han10"><div class="name-en">Thief</div><div class="name-ko">도둑</div></div>
+  </div>
+
+  <button id="capture-btn">CAPTURE</button>
+  <canvas id="canvas" style="display: none;"></canvas>
+
+  <script>
+
+      const firebaseConfig = {
+    apiKey: "AIzaSyCtN3FJJs73iGyRY9IqwKM5-oQCDeW0qZo",
+    authDomain: "addabubble-aeeb7.firebaseapp.com",
+    projectId: "addabubble-aeeb7",
+    storageBucket: "addabubble-aeeb7.appspot.com",
+    messagingSenderId: "56279476270",
+    appId: "1:56279476270:web:7ece8c4916f8dc115f17bf"
+  };
+
+  // ✅ 초기화
+  firebase.initializeApp(firebaseConfig);
+  const storage = firebase.storage();
+    
+    const video = document.getElementById('camera-view');
+    const captureBtn = document.getElementById('capture-btn');
+    const canvas = document.getElementById('canvas');
+    const body = document.body;
+
+    // 카메라 실행
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false })
+      .then(stream => {
+        video.srcObject = stream;
+        video.onloadedmetadata = () => {
+          video.play();
+        };
+      })
+      .catch(err => alert("카메라에 접근할 수 없습니다: " + err.message));
+
+    // 긴 문장 텍스트
+const quotes = {
+  Han1: {
+    en: "If it can be expressed in one sentence,\nis it really art?",
+    ko: "한 문장으로 표현이 가능하다면,\n그게 예술이 맞는가?"
+  },
+  Han2: {
+    en: "If you think you can do it too,\nmaybe you should try.",
+    ko: "나도 할 수 있을 것 같다면,\n한 번 해보는 것도 좋을듯."
+  },
+  Han3: {
+    en: "How many people truly equate\nart with life?",
+    ko: "예술과 삶을 동일시 하는 사람이\n몇이나 되겠는가."
+  },
+  Han4: {
+    en: "If uniqueness defines art,\nthat idea is already outdated.",
+    ko: "유일함이 예술의 특성이란 말은,\n옛 말일 뿐이다."
+  },
+  Han5: {
+    en: "Uncomfortable to see,\nimpossible to forget.",
+    ko: "불편해서 눈을 피했지만,\n계속 생각나더라."
+  },
+  Han6: {
+    en: "The more technology evolves,\nthe more extraordinary the artist becomes.",
+    ko: "기술이 발전할수록\n예술가는 더 대단해진다."
+  },
+  Han7: {
+    en: "Perfect order leaves\nno room for imagination.",
+    ko: "완벽한 질서는\n상상력을 허용하지 않는다."
+  },
+  Han8: {
+    en: "Without a viewer,\nit's incomplete.",
+    ko: "보는 이가 없으면,\n미완성이다."
+  },
+  Han9: {
+    en: "If all you want is to speak the truth,\ngo to a news studio, not a gallery.",
+    ko: "진실만을 말하려면,\n미술관이 아니라 방송국으로 가라."
+  },
+  Han10: {
+    en: "Some works retrieve forgotten memories\nlike a thief.",
+    ko: "어떤 작품은 잊고 있었던 기억을\n도둑처럼 찾아낸다."
+  }
+};
+
+let lang = 'en'; // ✅ 초기값은 영어
+const langBtn = document.getElementById('lang-toggle');
+
+langBtn.addEventListener('click', () => {
+  lang = (lang === 'en') ? 'ko' : 'en';
+  langBtn.textContent = '한/EN';  // ✅ 항상 고정된 표시
+  if (currentTextSticker && currentTextSticker.dataset.id) {
+    const id = currentTextSticker.dataset.id;
+    const quote = quotes[id];
+    currentTextSticker.textContent = quote[lang];
+  }
+});
+    
+let currentTextSticker = null;
+let lastPosition = null;
+
+document.querySelectorAll('.text-option').forEach(option => {
+  option.addEventListener('click', () => {
+    // 선택 표시
+    document.querySelectorAll('.text-option').forEach(opt => opt.classList.remove('selected'));
+    option.classList.add('selected');
+
+    // 기존 스티커 제거 및 위치 저장
+    if (currentTextSticker) {
+      lastPosition = {
+        left: currentTextSticker.style.left,
+        top: currentTextSticker.style.top
+      };
+      currentTextSticker.remove();
+    }
+
+    const id = option.dataset.id;
+    const quote = quotes[id];
+    if (!quote) return;
+
+const div = document.createElement('div');
+div.className = 'text-sticker';
+div.textContent = quote[lang];
+div.dataset.id = id;
+    
+// 스티커가 처음 선택될 경우 중앙 정렬
+if (lastPosition) {
+  div.style.left = lastPosition.left;
+  div.style.top = lastPosition.top;
+} else {
+  div.style.left = `${window.innerWidth / 2 - 100}px`;
+  div.style.top = `${window.innerHeight / 2 - 30}px`;
+}
+
+makeDraggable(div);
+
+// ✅ 네온 효과 적용
+const glow = neonColors[currentNeonIndex];
+div.style.textShadow = `
+  0 0 5px ${glow},
+  0 0 10px ${glow},
+  0 0 20px ${glow},
+  0 0 40px ${glow}
+`;
+
+body.appendChild(div);
+currentTextSticker = div;
+  });
+});
+
+        const neonColors = ['#ffa500', '#00ffff', '#ff00ff', '#00ff00'];
+        let currentNeonIndex = 0;
+
+        let currentColorIndex = 0;
+        const colorBtn = document.getElementById('color-toggle');
+
+        colorBtn.addEventListener('click', () => {
+        currentNeonIndex = (currentNeonIndex + 1) % neonColors.length;
+        const glow = neonColors[currentNeonIndex];
+
+        document.querySelectorAll('.text-sticker').forEach(el => {
+        el.style.color = 'white';
+        el.style.textShadow = `
+        0 0 5px ${glow},
+        0 0 10px ${glow},
+        0 0 20px ${glow},
+        0 0 40px ${glow}
+    `;
+  });
+});
+       
+    function makeDraggable(div) {
+      let offsetX, offsetY, isDragging = false;
+      div.addEventListener('touchstart', e => {
+        isDragging = true;
+        const touch = e.touches[0];
+        offsetX = touch.clientX - div.getBoundingClientRect().left;
+        offsetY = touch.clientY - div.getBoundingClientRect().top;
+      });
+      document.addEventListener('touchmove', e => {
+        if (!isDragging) return;
+        const touch = e.touches[0];
+        div.style.left = (touch.pageX - offsetX) + 'px';
+        div.style.top = (touch.pageY - offsetY) + 'px';
+      }, { passive: false });
+      document.addEventListener('touchend', () => isDragging = false);
+    }
+
+    // 캡처 기능
+   captureBtn.addEventListener('click', () => {
+  const width = video.videoWidth;
+  const height = video.videoHeight;
+
+  if (width === 0 || height === 0) {
+    alert("카메라 영상이 아직 준비되지 않았습니다.");
+    return;
+  }
+
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, width, height);
+
+// 스티커 렌더링
+document.querySelectorAll('.sticker, .text-sticker').forEach(el => {
+  const rect = el.getBoundingClientRect();
+  const scaleX = width / window.innerWidth;
+  const scaleY = height / window.innerHeight;
+  const x = (rect.left + rect.width / 2) * scaleX;
+  const y = rect.top * scaleY + 10;
+  const lines = el.textContent.split('\n');
+
+  // 배경
+  ctx.fillStyle = window.getComputedStyle(el).backgroundColor;
+  ctx.fillRect(rect.left * scaleX, rect.top * scaleY, rect.width * scaleX, rect.height * scaleY);
+
+  // 텍스트
+const glowColor = window.getComputedStyle(el).color;
+const shadow = window.getComputedStyle(el).textShadow;
+
+// textShadow가 여러 색상이라면 첫 번째만 추출
+const match = shadow.match(/rgba?\([^)]+\)|#[0-9a-fA-F]+/);
+const neonColor = match ? match[0] : glowColor;
+
+ctx.font = '20px sans-serif';
+ctx.fillStyle = 'white';              // 기본 텍스트 색상
+ctx.shadowColor = neonColor;          // 네온 색상
+ctx.shadowBlur = 15;                  // 네온 확산 효과
+ctx.shadowOffsetX = 0;
+ctx.shadowOffsetY = 0;
+ctx.textAlign = 'center';
+ctx.textBaseline = 'top';
+
+lines.forEach((line, i) => {
+  ctx.fillText(line, x, y + i * 24);
+});
+});
+
+  // 📤 공유 또는 다운로드
+canvas.toBlob(blob => {
+  const preview = document.getElementById('preview-container');
+  const img = document.getElementById('preview-img');
+  const shareBtn = document.getElementById('share-btn');
+  const downloadBtn = document.getElementById('download-btn');
+  const retakeBtn = document.getElementById('retake-btn');
+
+  const url = URL.createObjectURL(blob);
+  img.src = url;
+  preview.style.display = 'flex';
+
+  const file = new File([blob], 'bubble-capture.png', { type: 'image/png' });
+
+  shareBtn.onclick = () => {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({
+        files: [file],
+        title: 'Add a Bubble',
+        text: 'Check out my AR bubble image!',
+      }).catch(err => {
+        alert('공유가 실패했어요.');
+      });
+    } else {
+      alert('이 기기에서는 공유가 지원되지 않습니다.');
+    }
+  };
+
+downloadBtn.onclick = () => {
+  const file = new File([blob], 'bubble-capture.png', { type: 'image/png' });
+
+  const storageRef = storage.ref();
+  const filename = `screenshots/${Date.now()}.png`;
+  const uploadTask = storageRef.child(filename).put(file);
+
+  uploadTask
+    .then(() => {
+      alert('이미지가 가상 앨범에 업로드되었습니다.');
+      // window.location.href = 'https://kahan222.github.io/add-a-bubble/gallery.html'; // 자동 이동 원할 경우
+    })
+    .catch(err => {
+      alert('업로드 실패: ' + err.message);
+    });
+};
+
+  retakeBtn.onclick = () => {
+    preview.style.display = 'none';
+    URL.revokeObjectURL(url);
+  };
+}, 'image/png');
+});
+  </script>
+  <div id="preview-container" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: black; z-index: 100; flex-direction: column; align-items: center; justify-content: center;">
+  <img id="preview-img" style="max-width: 90%; max-height: 70%; margin-bottom: 20px;" />
+  <div style="display: flex; gap: 10px;">
+    <button id="share-btn" style="padding: 10px 16px; font-weight: bold;">SAVE</button>
+    <button id="download-btn" style="padding: 10px 16px; font-weight: bold;">SHARE</button>
+    <button id="retake-btn" style="padding: 10px 16px; font-weight: bold;">RESET</button>
+  </div>
+</div>
+</body>
+</html>
