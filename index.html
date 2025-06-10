@@ -419,12 +419,15 @@ downloadBtn.onclick = () => {
   .then(res => res.json())
   .then(data => {
     alert("업로드 성공!\n이미지 URL: " + data.secure_url);
-    // 원한다면 gallery.html 에 이 secure_url 보내는 로직도 여기서 처리 가능
-  })
-  .catch(err => {
-    alert("업로드 실패: " + err.message);
+  firebase.firestore().collection("screenshots").add({
+    imageUrl: data.secure_url,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
   });
-};
+
+})
+.catch(err => {
+  alert("업로드 실패: " + err.message);
+});
 
   retakeBtn.onclick = () => {
     preview.style.display = 'none';
