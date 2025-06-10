@@ -365,8 +365,8 @@ lines.forEach((line, i) => {
 canvas.toBlob(blob => {
   const preview = document.getElementById('preview-container');
   const img = document.getElementById('preview-img');
-  const saveBtn = document.getElementById('save-btn');
   const shareBtn = document.getElementById('share-btn');
+  const downloadBtn = document.getElementById('download-btn');
   const retakeBtn = document.getElementById('retake-btn');
 
   const url = URL.createObjectURL(blob);
@@ -375,9 +375,9 @@ canvas.toBlob(blob => {
 
   const file = new File([blob], 'bubble-capture.png', { type: 'image/png' });
 
-  saveBtn.onclick = () => {
-    if (navigator.cansave && navigator.canSave({ files: [file] })) {
-      navigator.save({
+  shareBtn.onclick = () => {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      navigator.share({
         files: [file],
         title: 'Add a Bubble',
         text: 'Check out my AR bubble image!',
@@ -389,6 +389,12 @@ canvas.toBlob(blob => {
     }
   };
 
+  downloadBtn.onclick = () => {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'bubble-capture.png';
+    a.click();
+  };
 
   retakeBtn.onclick = () => {
     preview.style.display = 'none';
@@ -400,8 +406,8 @@ canvas.toBlob(blob => {
   <div id="preview-container" style="display:none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: black; z-index: 100; flex-direction: column; align-items: center; justify-content: center;">
   <img id="preview-img" style="max-width: 90%; max-height: 70%; margin-bottom: 20px;" />
   <div style="display: flex; gap: 10px;">
-    <button id="save-btn" style="padding: 10px 16px; font-weight: bold;">SAVE</button>
-    <button id="share-btn" style="padding: 10px 16px; font-weight: bold;">share</button>
+    <button id="share-btn" style="padding: 10px 16px; font-weight: bold;">SAVE</button>
+    <button id="download-btn" style="padding: 10px 16px; font-weight: bold;">SHARE</button>
     <button id="retake-btn" style="padding: 10px 16px; font-weight: bold;">RESET</button>
   </div>
 </div>
