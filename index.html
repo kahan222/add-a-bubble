@@ -407,20 +407,15 @@ canvas.toBlob(blob => {
   };
 
 downloadBtn.onclick = () => {
-  const file = new File([blob], 'bubble-capture.png', { type: 'image/png' });
+  const base64 = canvas.toDataURL('image/png');
 
-  const storageRef = storage.ref();
-  const filename = `screenshots/${Date.now()}.png`;
-  const uploadTask = storageRef.child(filename).put(file);
-
-  uploadTask
-    .then(() => {
-      alert('이미지가 가상 앨범에 업로드되었습니다.');
-      // window.location.href = 'https://kahan222.github.io/add-a-bubble/gallery.html'; // 자동 이동 원할 경우
-    })
-    .catch(err => {
-      alert('업로드 실패: ' + err.message);
-    });
+  fetch("https://script.google.com/macros/s/AKfycbw9yz0V8DxtS_hKVf6ksIUub6Cc2jJheJi2bIPwQpNBuIdIpQbEqISf0rFYI9clQCeRjA/exec", {
+    method: "POST",
+    body: JSON.stringify({ image: base64 }),
+    headers: { "Content-Type": "application/json" }
+  })
+  .then(() => alert("이미지가 저장되었습니다."))
+  .catch(err => alert("업로드 실패: " + err.message));
 };
 
   retakeBtn.onclick = () => {
